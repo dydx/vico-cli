@@ -1,89 +1,55 @@
-# updateUserRollingDay Endpoint Documentation
+# Update User Rolling Day API
 
-## Overview
-The `updateUserRollingDay` endpoint updates the billing cycle day for a user's subscription. This setting determines which day of the month the user will be billed for their recurring subscription.
-
-## API Details
+## Endpoint Details
 - **Path**: `/vip/user/rolling/day`
 - **Method**: POST
-- **Base URL**: https://api-us.vicohome.io
+- **Content-Type**: application/json
+- **Description**: Updates the billing cycle day for a user's VIP subscription service
 
 ## Request Parameters
-The endpoint accepts a `RollingDayEntry` object that extends `BaseEntry` with the following fields:
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| rollingDay | Integer | Yes | The day of the month for the billing cycle (1-28) |
-| userVipId | Integer | Yes | The ID of the user's VIP subscription |
-| app | Object | Yes | Application information (inherited from BaseEntry) |
-| countryNo | String | Yes | Country code (e.g., "US") (inherited from BaseEntry) |
-| language | String | Yes | Language code (e.g., "en") (inherited from BaseEntry) |
-| tenantId | String | Yes | Tenant identifier (inherited from BaseEntry) |
-
-### Example Request Body
 ```json
 {
-  "rollingDay": 15,
-  "userVipId": 12345,
-  "app": {
-    "appName": "vicohome",
+  "rollingDay": 15,         // Day of month for billing cycle (1-28)
+  "userVipId": 12345,       // User's VIP subscription ID
+  "app": {                  // Standard app information
+    "appName": "vicohome", 
     "appVersion": "1.2.3",
     "appBuild": "123",
     "channelId": 1
   },
-  "countryNo": "US",
-  "language": "en",
-  "tenantId": "default"
+  "countryNo": "US",        // Country code
+  "language": "en",         // Language code
+  "tenantId": "default"     // Tenant identifier
 }
 ```
 
-## Response Structure
-The endpoint returns a `BaseResponse` object:
+### Required Fields
+- `rollingDay`: Integer between 1-28 representing the day of month for billing cycle
+- `userVipId`: Integer representing the user's VIP subscription ID
+- Standard app and user context fields (app, countryNo, language, tenantId)
 
-### BaseResponse Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| result | Integer | Status code (0 for success, negative values indicate errors) |
-| msg | String | Status message or error description |
+## Response Format
 
-### Example Success Response
 ```json
 {
-  "result": 0,
-  "msg": "success"
+  "result": 0,              // Status code (0 for success, negative for errors)
+  "msg": "success"          // Status message
 }
 ```
 
-### Example Error Response
-```json
-{
-  "result": -1001,
-  "msg": "Invalid subscription ID"
-}
-```
+### Success Response
+- `result`: 0
+- `msg`: "success" or other success message
 
-## Error Codes
-| Code | Description |
-|------|-------------|
-| -1001 | Invalid subscription ID |
-| -1002 | Invalid rolling day value |
-| -2001 | Network error |
-| -4001 | Authentication error |
+### Error Responses
+- `-1001`: Invalid subscription ID
+- `-1002`: Invalid rolling day value
+- `-2001`: Network error
+- `-4001`: Authentication error
 
-## Usage in Application
-The endpoint is called in the subscription settings flow:
-1. When a user navigates to their VIP subscription management screen (in VipServiceActivity)
-2. User selects a new billing cycle day from the available options
-3. The application creates a RollingDayEntry with the selected day and the user's subscription ID
-4. Upon successful update, the UI is refreshed to show the new billing cycle day
-5. This setting affects when the user will be charged for their recurring subscription
-
-## Related Endpoints
-- `/vip/user/service/info` (getVipUserServiceInfo) - Gets VIP user service information, including current rolling day
-
-## Constraints
-- User must be authenticated to access this endpoint
+## Usage Notes
+- The rolling day value is limited to 1-28 to avoid issues with months having fewer than 31 days
+- The user must be authenticated to access this endpoint
 - The userVipId must be valid and belong to the authenticated user
-- The rollingDay value is typically limited to 1-28 to avoid issues with months that have fewer than 31 days
-- This setting typically only applies to monthly subscriptions, not annual ones
-- Changing the billing cycle day may affect the prorated charges in the next billing period
+- This endpoint is typically used in subscription management flows when a user wants to change their billing cycle date
