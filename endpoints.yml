@@ -1,0 +1,276 @@
+baseUrl: https://api-us.vicohome.io
+alternativeBaseUrls:
+  - https://api-eu.vicohome.io
+  - https://api-staging-us.vicohome.io
+  - https://api-staging-eu.vicohome.io
+
+apiGroups:
+  account:
+    status: openapi
+    endpoints:
+      login:
+        status: openapi
+        description: Login
+        path: /account/login
+        method: POST
+      logout:
+        status: openapi
+        description: Logout
+        path: /account/logout/
+        method: POST
+      getipinfo:
+        status: openapi
+        description: Get IP and country information
+        path: /account/getipinfo
+        method: GET
+  device:
+    status: openapi
+    endpoints:
+      addActivityZone:
+        status: openapi
+        description: Zone activity management
+        path: /device/insertactivityzone
+        method: POST
+      addLocation:
+        status: openapi
+        description: Add location data
+        path: /location/insertlocation/
+        method: POST
+      audition:
+        status: openapi
+        description: Test doorbell audio functionality
+        path: /device/mechanical/dingdong/audition
+        method: POST
+      createSleepPlan:
+        status: openapi
+        description: Create device sleep schedule
+        path: /device/dormancy/create
+        method: POST
+      deleteActivityZone:
+        status: openapi
+        description: Delete activity zones
+        path: /device/deleteactivityzone
+        method: POST
+      deleteLocation:
+        status: openapi
+        description: Delete location data
+        path: /cationcation/deletelocation
+        method: POST
+      deleteSleepPlan:
+        status: openapi
+        description: Delete sleep plans
+        path: /device/dormancy/delete
+        method: POST
+      deviceThumbImage:
+        status: openapi
+        description: Get device thumbnail images
+        path: /device/devicePushImage
+        method: POST
+      editSleepPlan:
+        status: openapi
+        description: Edit device sleep plans
+        path: /device/dormancy/edit
+        method: POST
+      getActivityZone:
+        status: openapi
+        description: Get activity zone data
+        path: /device/getactivityzone
+        method: POST
+      getDeviceAttributes:
+        status: openapi
+        description: Get device attributes
+        path: /device/getDeviceAttributes
+        method: POST
+      getOtaStatue:
+        status: openapi
+        description: Get device update status
+        path: /device/otastatus/
+        method: POST
+      getSingleDevice:
+        status: openapi
+        description: Get single device data
+        path: /device/selectsingledevice
+        method: POST
+      listDevice:
+        status: openapi
+        description: List all devices
+        path: /device/listuserdevices
+        method: POST
+      listLocation:
+        status: openapi
+        description: List all locations
+        path: /location/listlocation
+        method: POST
+      listSleepPlan:
+        status: openapi
+        description: List all sleep plans
+        path: /device/dormancy/list
+        method: POST
+      loadPersonDetectionDetailInfo:
+        status: openapi
+        description: Person detection information
+        path: /device/queryMessageNotification/v1
+        method: POST
+      modifyDeviceAttributes:
+        status: openapi
+        description: Update device attributes
+        path: /device/modifyDeviceAttributes
+        method: POST
+      queryAiEventInfo:
+        status: openapi
+        description: Query AI event information
+        path: /aiAssist/queryEventObjectSwitch
+        method: POST
+      queryDeviceCloudVipInfo:
+        status: openapi
+        description: Query VIP information
+        path: /vip/device/cloud/info
+        method: POST
+      queryFreeTier:
+        status: openapi
+        description: Query free tier information
+        path: /vip/freetier/info
+        method: POST
+      queryMargePushSwitch:
+        status: openapi
+        description: Query push notification settings
+        path: /usersetting/queryswitch
+        method: POST
+      queryNotificationAiBird:
+        status: openapi
+        description: Bird detection notifications
+        path: /birdLovers/queryBirdAiSetting
+        method: POST
+      rotateCalibration:
+        status: openapi
+        description: Device rotation calibration
+        path: /device/rotate-calibration
+        method: POST
+      setNotificationAiBird:
+        status: openapi
+        description: Set bird detection notifications
+        path: /birdLovers/updateBirdAiSetting
+        method: POST
+      sleepSwitchSetting:
+        status: openapi
+        description: Sleep mode settings
+        path: /device/dormancy/switch
+        method: POST
+      startOta:
+        status: openapi
+        description: Start device update
+        path: /device/otastart/
+        method: POST
+      unbindDevice:
+        status: openapi
+        description: Unbind devices
+        path: /device/deactivatedevice
+        method: POST
+      updateActivityZone:
+        status: openapi
+        description: Update activity zones
+        path: /device/updateactivityzone
+        method: POST
+      updateEventObjectSwitch:
+        status: openapi
+        description: Update object detection settings
+        path: /aiAssist/updateEventObjectSwitch
+        method: POST
+      updateFloodlightLuminance:
+        status: openapi
+        description: Update floodlight brightness
+        path: /device/updateFloodlightLuminance
+        method: POST
+      updateFloodlightSwitch:
+        status: openapi
+        description: Control floodlight
+        path: /device/updateFloodlightSwitch
+        method: POST
+      updateLocation:
+        status: openapi
+        description: Update location data
+        path: /location/updatelocationinfo
+        method: POST
+      updateMargePushSwitch:
+        status: openapi
+        description: Update push notification settings
+        path: /usersetting/switch
+        method: POST
+      uploadPersonDetectionDetailInfo:
+        status: openapi
+        description: Upload person detection information
+        path: /device/updateMessageNotification/v1
+        method: POST
+
+  payment:
+    status: unverified
+    endpoints:
+      getPurchaseDevice:
+        status: verified
+        description: Get purchase information for a device
+        path: /vip/available/purchase/device
+        method: POST
+      getSim4gTierListV4:
+        status: verified
+        description: Get 4G SIM card tier options
+        path: /vip/tier/list/v4
+        method: POST
+      getTierListV4:
+        status: verified
+        description: Get subscription tier options
+        path: /vip/tier/list/v4
+        method: POST
+      getVipUserServiceInfo:
+        status: unverified
+        description: Get VIP user service information
+      queryVipDevicePosition:
+        status: unverified
+        description: Query VIP device positions
+      updateUserRollingDay:
+        status: unverified
+        description: Update user billing cycle day
+      uploadGooglePayInfo:
+        status: unverified
+        description: Process Google Pay payments
+
+  library:
+    status: unverified
+    endpoints:
+      closeP2PConnection:
+        status: unverified
+        description: Close peer-to-peer connection
+      deleteRecord:
+        status: unverified
+        description: Delete videos/recordings
+      getEventDetail:
+        status: unverified
+        description: Get details for an event
+      getEventRecordByFilter:
+        status: openapi
+        description: Get recordings filtered by criteria
+        path: /library/newselectlibrary/newevent
+        method: POST
+      getLibraryByTraceId:
+        status: unverified
+        description: Get library data by trace ID
+      getLibraryStatus:
+        status: unverified
+        description: Get library status
+      openP2PConnection:
+        status: unverified
+        description: Open peer-to-peer connection
+      queryUserActivityZone:
+        status: unverified
+        description: Query user activity zones
+      queryVideoSearchOption:
+        status: unverified
+        description: Search for videos with options
+      queryVideoSearchOptionBySn:
+        status: unverified
+        description: Search for videos by serial number
+      setMarkStatus:
+        status: unverified
+        description: Set mark status for recordings
+      setReadStatus:
+        status: unverified
+        description: Set read status for recordings

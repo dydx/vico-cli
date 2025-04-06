@@ -1,0 +1,3277 @@
+openapi: 3.0.0
+info:
+  title: Vicohome API
+  description: |
+    API specification for the Vicohome IoT platform, focusing on authentication,
+    bird detection, and video library management.
+  version: 1.0.0
+  contact:
+    name: Vicohome Support
+    url: https://vicohome.io/support
+    email: support@vicohome.io
+
+servers:
+  - url: https://api-us.vicohome.io
+    description: US Region API Server
+  - url: https://api-eu.vicohome.io
+    description: EU Region API Server
+  - url: https://api-staging-us.vicohome.io
+    description: US Staging API Server
+  - url: https://api-staging-eu.vicohome.io
+    description: EU Staging API Server
+
+paths:
+  /account/login:
+    post:
+      tags:
+        - Account Management
+      summary: Authenticate user
+      description: |
+        Authenticates users and provides access tokens for the API. 
+        Users can log in using either email/password or phone/password combinations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/logout/:
+    post:
+      tags:
+        - Account Management
+      summary: Terminate user session
+      description: |
+        Terminates a user's session and invalidates their authentication token. 
+        It provides a secure way for users to sign out of the application.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/getipinfo:
+    get:
+      tags:
+        - Account Management
+      summary: Get IP address information
+      description: |
+        Retrieves information about the user's IP address and geographic location. 
+        This information is used for region-specific settings, support routing, 
+        and determining the appropriate API servers for the user's geographical location.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeInfoResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /device/insertactivityzone:
+    post:
+      tags:
+        - Device Management
+      summary: Add activity zone to a device
+      description: |
+        Creates a new activity zone for a device. Activity zones define specific areas 
+        within a camera's view where motion detection and alerts should be active.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneBean'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneAddResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/deleteactivityzone:
+    post:
+      tags:
+        - Device Management
+      summary: Delete activity zone from a device
+      description: |
+        Deletes an existing activity zone from a device. This operation cannot be undone.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneDeleteEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/getactivityzone:
+    post:
+      tags:
+        - Device Management
+      summary: Get all activity zones for a device
+      description: |
+        Retrieves all configured activity zones for a specific device. Activity zones 
+        are user-defined areas within a camera's field of view where motion detection and 
+        alerts are active.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneGetEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneGetResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/updateactivityzone:
+    post:
+      tags:
+        - Device Management
+      summary: Update an existing activity zone
+      description: |
+        Modifies an existing activity zone for a device. Activity zones are user-defined 
+        areas within a camera's field of view where motion detection and alerts are active.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneUpdateEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /birdLovers/queryBirdAiSetting:
+    post:
+      tags:
+        - AI Features
+      summary: Get bird detection settings
+      description: |
+        Retrieves the current bird detection analysis and notification settings for a specific 
+        device. This allows users to check whether bird detection and related notifications are 
+        enabled for compatible cameras.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SNEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiBirdResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /birdLovers/updateBirdAiSetting:
+    post:
+      tags:
+        - AI Features
+      summary: Update bird detection settings
+      description: |
+        Updates the bird detection analysis and notification settings for a specific device. 
+        This enables users to control whether bird detection is active and whether they receive 
+        notifications for detected birds.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiBirdUpdateEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/updateFloodlightSwitch:
+    post:
+      tags:
+        - Device Management
+      summary: Control device floodlight
+      description: |
+        Controls the floodlight (turn on/off) for compatible devices. 
+        This provides remote control of the device's illumination feature.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFloodlightSwitch'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/updateFloodlightLuminance:
+    post:
+      tags:
+        - Device Management
+      summary: Adjust floodlight brightness
+      description: |
+        Adjusts the brightness level of a device's floodlight. 
+        This provides fine-grained control over the illumination intensity for compatible devices.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFloodlightLuminanceRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /location/insertlocation/:
+    post:
+      tags:
+        - Location Management
+      summary: Create a new location
+      description: |
+        Creates a new location entry in the system. Locations are used to organize 
+        devices geographically, helping users manage devices across multiple sites.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddLocationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /cationcation/deletelocation:
+    post:
+      tags:
+        - Location Management
+      summary: Delete a location
+      description: |
+        Removes a location from the system. When a location is deleted, any devices 
+        associated with that location may be reassigned or have their location information updated.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteLocationEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteLocationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/mechanical/dingdong/audition:
+    post:
+      tags:
+        - Device Management
+      summary: Test doorbell audio
+      description: |
+        Triggers a doorbell's chime to play a test sound. This allows users to 
+        verify the doorbell's audio functionality and adjust volume settings accordingly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommonSNRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/dormancy/create:
+    post:
+      tags:
+        - Device Management
+      summary: Create device sleep schedule
+      description: |
+        Creates a new sleep schedule for a device. Sleep plans allow users to define 
+        specific time periods during which the device will enter a low-power state, 
+        reducing notifications and conserving energy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceSleepPlanBean'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/dormancy/delete:
+    post:
+      tags:
+        - Device Management
+      summary: Delete device sleep schedule
+      description: |
+        Deletes an existing sleep schedule for a device. This allows users to 
+        remove specific sleep plans that are no longer needed, reverting the device 
+        to its normal operational state during those time periods.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteSleepPlanEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/devicePushImage:
+    post:
+      tags:
+        - Device Management
+      summary: Get device thumbnail images
+      description: |
+        Retrieves thumbnail images for cameras associated with the user's account.
+        These images represent the most recent snapshot from each camera and are 
+        typically used for device preview in dashboard views.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceThumbImageResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/dormancy/edit:
+    post:
+      tags:
+        - Device Management
+      summary: Edit device sleep plan
+      description: |
+        Updates an existing sleep schedule for a device. Sleep plans allow users to define 
+        specific time periods during which the device will enter a low-power state, 
+        reducing notifications and conserving energy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceSleepPlanBean'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/getDeviceAttributes:
+    post:
+      tags:
+        - Device Management
+      summary: Get device attributes
+      description: |
+        Retrieves detailed device information including hardware specifications, 
+        real-time status, and configurable settings. This endpoint provides comprehensive
+        information about a device's capabilities and current state.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceAttributesRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceAttributesResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/otastatus/:
+    post:
+      tags:
+        - Device Management
+      summary: Get device update status
+      description: |
+        Retrieves the current status of firmware updates for a device. This endpoint
+        can be used to check if an update is in progress, the progress percentage,
+        and the target firmware version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SNEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtaStatusResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/selectsingledevice:
+    post:
+      tags:
+        - Device Management
+      summary: Get single device data
+      description: |
+        Retrieves comprehensive information about a specific device. This endpoint provides
+        detailed device information including model details, status information, location,
+        thumbnail image data, SD card information, and supported features.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SNEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleDeviceResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/listuserdevices:
+    post:
+      tags:
+        - Device Management
+      summary: List all devices
+      description: |
+        Retrieves a list of all devices associated with the user's account. This endpoint
+        provides an overview of all devices, including their status, location, and key attributes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDeviceResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /location/listlocation:
+    post:
+      tags:
+        - Location Management
+      summary: List all locations
+      description: |
+        Retrieves a list of all locations associated with the user's account. Locations
+        are used to organize devices geographically, helping users manage devices
+        across multiple sites.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListLocationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/dormancy/list:
+    post:
+      tags:
+        - Device Management
+      summary: List all sleep plans
+      description: |
+        Retrieves all sleep plans configured for a specific device. Sleep plans define 
+        specific time periods during which the device will enter a low-power state,
+        reducing notifications and conserving energy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SNEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSleepPlanResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/queryMessageNotification/v1:
+    post:
+      tags:
+        - AI Features
+      summary: Get person detection settings
+      description: |
+        Retrieves AI detection notification settings for a specific device. This endpoint
+        allows users to query which types of AI detections (people, packages, pets, 
+        vehicles, etc.) are configured to trigger notifications.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonDetectionRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDetectionResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/modifyDeviceAttributes:
+    post:
+      tags:
+        - Device Management
+      summary: Update device attributes
+      description: |
+        Updates configurable settings for a specific device. This endpoint allows
+        users to modify device configuration such as motion detection settings,
+        alarm settings, night vision, video settings, and audio settings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyDeviceAttributesRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /aiAssist/queryEventObjectSwitch:
+    post:
+      tags:
+        - AI Features
+      summary: Query AI event detection settings
+      description: |
+        Retrieves AI event detection settings for specified devices. This endpoint
+        shows which types of objects (person, package, pet, vehicle) are configured
+        to be detected for the devices.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryAiEventRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryAiEventResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /vip/device/cloud/info:
+    post:
+      tags:
+        - Subscription Management
+      summary: Query device VIP information
+      description: |
+        Retrieves subscription information for a specific device. This endpoint provides
+        details about premium features, subscription status, expiration date, and available
+        subscription tiers.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SNEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCloudVipResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /vip/freetier/info:
+    post:
+      tags:
+        - Subscription Management
+      summary: Query free tier information
+      description: |
+        Retrieves information about free tier services available on the Vicohome platform.
+        This endpoint provides details about features included in the free tier and any
+        available trials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FreeTierResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /usersetting/queryswitch:
+    post:
+      tags:
+        - User Settings
+      summary: Query push notification settings
+      description: |
+        Retrieves the user's push notification merging preferences. This setting determines
+        whether multiple notifications are combined into a single notification or sent
+        individually.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MargePushSwitchResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/rotate-calibration:
+    post:
+      tags:
+        - Device Management
+      summary: Calibrate device rotation
+      description: |
+        Used for calibrating a device's physical orientation. This endpoint follows a two-step
+        process: first initiating calibration, then checking completion status until the process 
+        is complete.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RotateCalibrationRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RotateCalibrationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/dormancy/switch:
+    post:
+      tags:
+        - Device Management
+      summary: Toggle sleep mode
+      description: |
+        Enables or disables sleep mode for a device. This provides immediate control over
+        a device's sleep state, separate from scheduled sleep plans. Sleep mode conserves
+        battery by reducing device activity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SleepSwitchRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/otastart/:
+    post:
+      tags:
+        - Device Management
+      summary: Start device update
+      description: |
+        Initiates an Over-The-Air (OTA) firmware update for a device. After calling this 
+        endpoint, clients should poll the getOtaStatue endpoint periodically to monitor 
+        progress through the update phases.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SNEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtaStatusResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/deactivatedevice:
+    post:
+      tags:
+        - Device Management
+      summary: Unbind device
+      description: |
+        Removes a device from a user's account. This endpoint is used when removing a device
+        from an account, factory resetting, troubleshooting, or transferring ownership.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SNEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /aiAssist/updateEventObjectSwitch:
+    post:
+      tags:
+        - AI Features
+      summary: Update object detection settings
+      description: |
+        Updates AI object detection settings for a specific device. This endpoint
+        allows enabling or disabling detection for different object types such as
+        people, packages, pets, and vehicles.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventObjectSwitchRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /library/newselectlibrary/newevent:
+    post:
+      tags:
+        - Recording Library
+      summary: Get recordings filtered by criteria
+      description: |
+        Retrieves video recordings based on specified filter criteria. This endpoint
+        supports filtering by time range, devices, event types, and other attributes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRecordFilterRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventRecordFilterResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /location/updatelocationinfo:
+    post:
+      tags:
+        - Location Management
+      summary: Update location information
+      description: |
+        Updates information about an existing location in the system. Locations are used 
+        to organize devices geographically, helping users manage devices across multiple sites.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLocationEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /usersetting/switch:
+    post:
+      tags:
+        - User Settings
+      summary: Update push notification settings
+      description: |
+        Updates the user's push notification merging preferences. This setting determines 
+        whether the system should combine multiple notifications into a single notification 
+        (merged) or send individual notifications for each event (non-merged).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MegerPushEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /device/updateMessageNotification/v1:
+    post:
+      tags:
+        - AI Features
+      summary: Update person detection settings
+      description: |
+        Updates AI detection notification settings for a specific device. These settings 
+        control which types of objects (person, package, pets, vehicles, etc.) will trigger 
+        notifications when detected by the device's AI system.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonDetectionUpdateRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    BaseEntry:
+      type: object
+      properties:
+        app:
+          type: object
+          description: Application information
+        countryNo:
+          type: string
+          description: Country code
+          example: "US"
+        language:
+          type: string
+          description: Language code
+          example: "en"
+        tenantId:
+          type: string
+          description: Tenant identifier
+          
+    AccountEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            email:
+              type: string
+              description: User's email address
+              example: "user@example.com"
+            password:
+              type: string
+              description: User's password
+              example: "password123"
+            phone:
+              type: string
+              description: User's phone number
+              example: "1234567890"
+            code:
+              type: string
+              description: Verification code (used for code-based login)
+              example: "123456"
+            loginType:
+              type: integer
+              description: Login type (defaults to 0)
+              example: 0
+          
+    LoginResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: User ID
+                  example: 12345
+                name:
+                  type: string
+                  description: User name
+                  example: "User Name"
+                email:
+                  type: string
+                  description: User email address
+                  example: "user@example.com"
+                phone:
+                  type: string
+                  description: User phone number
+                  example: "1234567890"
+                node:
+                  type: string
+                  description: Node identifier
+                  example: "node-identifier"
+                trackerToken:
+                  type: string
+                  description: Tracking token
+                  example: "tracking-token-string"
+                token:
+                  type: object
+                  properties:
+                    token:
+                      type: string
+                      description: Authentication token
+                      example: "authentication-token-string"
+                    tokentype:
+                      type: string
+                      description: Token type (usually "Bearer")
+                      example: "Bearer"
+                      
+    NodeInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                ip:
+                  type: string
+                  description: The user's IP address
+                  example: "203.0.113.1"
+                countryCode:
+                  type: string
+                  description: Two-letter country code based on IP geolocation
+                  example: "US"
+                  
+    LocationEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - locationName
+            - country
+            - state
+            - city
+          properties:
+            adminId:
+              type: integer
+              description: User ID of the admin
+              example: 67890
+            locationName:
+              type: string
+              description: Name of the location
+              example: "Home"
+            country:
+              type: string
+              description: Country name
+              example: "US"
+            state:
+              type: string
+              description: State/province name
+              example: "California"
+            city:
+              type: string
+              description: City name
+              example: "San Francisco"
+            district:
+              type: string
+              description: District/area name
+              example: "Mission District"
+            streetAddress1:
+              type: string
+              description: Primary street address
+              example: "123 Main St"
+            streetAddress2:
+              type: string
+              description: Secondary street address
+              example: "Apt 4B"
+            postalCode:
+              type: string
+              description: Postal/ZIP code
+              example: "94107"
+            insertTime:
+              type: integer
+              description: Timestamp for insertion
+              example: 1617293000
+            id:
+              type: integer
+              description: Location ID (used for updates rather than creation)
+              example: 0
+              
+    AddLocationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: Unique identifier for the created location
+                  example: 12345
+                adminId:
+                  type: integer
+                  description: User ID of the admin
+                  example: 67890
+                locationName:
+                  type: string
+                  description: Name of the location
+                  example: "Home"
+                country:
+                  type: string
+                  description: Country name
+                  example: "US"
+                state:
+                  type: string
+                  description: State/province name
+                  example: "California"
+                city:
+                  type: string
+                  description: City name
+                  example: "San Francisco"
+                district:
+                  type: string
+                  description: District/area name
+                  example: "Mission District"
+                streetAddress1:
+                  type: string
+                  description: Primary street address
+                  example: "123 Main St"
+                streetAddress2:
+                  type: string
+                  description: Secondary street address
+                  example: "Apt 4B"
+                postalCode:
+                  type: string
+                  description: Postal/ZIP code
+                  example: "94107"
+                insertTime:
+                  type: integer
+                  description: Timestamp of creation
+                  example: 1617293000
+                isLocalData:
+                  type: boolean
+                  description: Flag indicating if this is local data
+                  example: false
+                isSelected:
+                  type: boolean
+                  description: Flag indicating if this location is selected
+                  example: false
+                  
+    DeleteLocationEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              description: ID of the location to delete
+              example: 12345
+              
+    DeviceBean:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the device
+          example: 67890
+        serialNumber:
+          type: string
+          description: Device serial number
+          example: "ABC123XYZ"
+        name:
+          type: string
+          description: Device name
+          example: "Front Door Camera"
+                  
+    DeleteLocationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                list:
+                  type: array
+                  description: List of devices affected by the location deletion
+                  items:
+                    $ref: '#/components/schemas/DeviceBean'
+                      
+    ZoneBean:
+      type: object
+      required:
+        - serialNumber
+        - zoneName
+        - vertices
+        - needRecord
+        - needPush
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number identifier
+          example: "ABC123XYZ"
+        zoneName:
+          type: string
+          description: Name for the activity zone
+          example: "Front Yard"
+        vertices:
+          type: string
+          description: |
+            Comma-separated list of coordinates that define the zone's shape.
+            Format is "x1,y1,x2,y2,..." where each coordinate is a relative value from 0.0 to 1.0.
+          example: "0.2,0.2,0.2,0.5,0.2,0.8,0.5,0.8,0.8,0.8,0.8,0.5,0.8,0.2,0.5,0.2"
+        needRecord:
+          type: integer
+          description: Flag to record events in this zone (1 = enabled, 0 = disabled)
+          enum: [0, 1]
+          example: 1
+        needAlarm:
+          type: integer
+          description: Flag to trigger alarm for events in this zone (1 = enabled, 0 = disabled)
+          enum: [0, 1]
+          example: 0
+        needPush:
+          type: integer
+          description: Flag to send push notifications for events in this zone (1 = enabled, 0 = disabled)
+          enum: [0, 1]
+          example: 1
+          
+    ZoneBeanExtended:
+      allOf:
+        - $ref: '#/components/schemas/ZoneBean'
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: Unique identifier for the zone
+              example: 12345
+            zoneNameId:
+              type: integer
+              description: Identifier for the zone name
+              example: 1
+            modelCategory:
+              type: integer
+              description: Model category identifier
+              example: 1
+            deviceName:
+              type: string
+              description: Name of the device
+              example: "Front Camera"
+          
+    ZoneDeleteEntry:
+      type: object
+      required:
+        - id
+        - serialNumber
+      properties:
+        id:
+          type: integer
+          description: The ID of the activity zone to delete
+          example: 12345
+        serialNumber:
+          type: string
+          description: Device serial number identifier
+          example: "ABC123XYZ"
+        language:
+          type: string
+          description: Language parameter for localized responses
+          example: "en"
+        requestId:
+          type: string
+          description: Unique identifier for the request
+          example: "req-123-456-789"
+          
+    ZoneGetEntry:
+      type: object
+      required:
+        - serialNumber
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number identifier
+          example: "ABC123XYZ"
+        requestId:
+          type: string
+          description: Unique identifier for the request
+          example: "req-123-456-789"
+        language:
+          type: string
+          description: Language parameter for localized responses
+          example: "en"
+          
+    ZoneUpdateEntry:
+      allOf:
+        - $ref: '#/components/schemas/ZoneBean'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              description: Unique identifier for the zone to update
+              example: 12345
+    
+    BaseResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          description: Status code (0 for success, negative values for errors)
+          example: 0
+        msg:
+          type: string
+          description: Status message or error description
+          example: "success"
+    
+    ZoneAddResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: ID of the newly created activity zone
+                  example: 12345
+                  
+    ZoneGetResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                list:
+                  type: array
+                  description: List of activity zones for the specified device
+                  items:
+                    $ref: '#/components/schemas/ZoneBeanExtended'
+    
+    SNEntry:
+      type: object
+      required:
+        - serialNumber
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number identifier
+          example: "ABC123XYZ"
+        reason:
+          type: integer
+          description: Optional reason code
+          example: 0
+          
+    AiBirdResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                aiAnalyzeSwitch:
+                  type: boolean
+                  description: Whether bird detection analysis is enabled on the device
+                  example: true
+                aiNotifySwitch:
+                  type: boolean
+                  description: Whether notifications for bird detection events are enabled
+                  example: false
+                  
+    AiBirdUpdateEntry:
+      type: object
+      required:
+        - serialNumber
+        - aiAnalyzeSwitch
+        - aiNotifySwitch
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number identifier
+          example: "ABC123XYZ"
+        aiAnalyzeSwitch:
+          type: boolean
+          description: Flag to enable/disable bird detection analysis
+          example: true
+        aiNotifySwitch:
+          type: boolean
+          description: Flag to enable/disable notifications for bird detection
+          example: false
+        requestId:
+          type: string
+          description: Unique identifier for the request
+          example: "req-123-456-789"
+        language:
+          type: string
+          description: Language parameter for localized responses
+          example: "en"
+          
+    UpdateFloodlightSwitch:
+      type: object
+      required:
+        - serialNumber
+        - switchOn
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number identifier
+          example: "ABC123XYZ"
+        switchOn:
+          type: boolean
+          description: Flag to turn the floodlight on (true) or off (false)
+          example: true
+          
+    UpdateFloodlightLuminanceRequest:
+      type: object
+      required:
+        - serialNumber
+        - luminance
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number identifier
+          example: "ABC123XYZ"
+        luminance:
+          type: integer
+          description: The brightness level for the floodlight (typically 1-100)
+          example: 75
+          minimum: 1
+          maximum: 100
+          
+    CommonSNRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number identifier
+              example: "ABC123XYZ"
+              
+    DeviceSleepPlanBean:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+            - startHour
+            - startMinute
+            - endHour
+            - endMinute
+            - period
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number identifier
+              example: "ABC123XYZ"
+            startHour:
+              type: integer
+              description: Start hour in 24-hour format (0-23)
+              example: 22
+              minimum: 0
+              maximum: 23
+            startMinute:
+              type: integer
+              description: Start minute (0-59)
+              example: 0
+              minimum: 0
+              maximum: 59
+            endHour:
+              type: integer
+              description: End hour in 24-hour format (0-23)
+              example: 6
+              minimum: 0
+              maximum: 23
+            endMinute:
+              type: integer
+              description: End minute (0-59)
+              example: 0
+              minimum: 0
+              maximum: 59
+            period:
+              type: integer
+              description: Period identifier (1 for weekly schedule, 0 for single day)
+              example: 1
+              enum: [0, 1]
+            planDay:
+              type: integer
+              description: Single day selection (used when period=0)
+              example: 1
+              minimum: 1
+              maximum: 7
+            planStartDay:
+              type: array
+              description: List of days of the week (1=Monday, 7=Sunday), used when period=1
+              items:
+                type: integer
+                minimum: 1
+                maximum: 7
+              example: [1, 2, 3, 4, 5]
+              
+    DeleteSleepPlanEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+            - period
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number identifier
+              example: "ABC123XYZ"
+            period:
+              type: integer
+              description: Period identifier to determine which sleep plan to delete (0 or 1)
+              example: 0
+              enum: [0, 1]
+    
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+      example:
+        result: -2001
+        msg: "Network error"
+        
+    DeviceThumbImageResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  serialNumber:
+                    type: string
+                    description: Device serial number
+                    example: "ABC123XYZ"
+                  lastPushImageUrl:
+                    type: string
+                    description: URL to the thumbnail image
+                    example: "https://cdn.vicohome.io/images/thumbnails/ABC123XYZ_1648756321.jpg"
+                  lastPushTime:
+                    type: integer
+                    format: int64
+                    description: Timestamp of when the image was last updated
+                    example: 1648756321000
+                    
+    DeviceAttributesRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "ABC123XYZ"
+            returnFixedAttributes:
+              type: boolean
+              description: Whether to include hardware specifications in the response
+              default: true
+            returnRealTimeAttributes:
+              type: boolean
+              description: Whether to include real-time status in the response
+              default: true
+            returnModifiableAttributes:
+              type: boolean
+              description: Whether to include configurable settings in the response
+              default: true
+              
+    DeviceAttributesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                fixedAttributes:
+                  type: object
+                  description: Hardware specifications and capabilities
+                  additionalProperties:
+                    type: object
+                    properties:
+                      value:
+                        type: string
+                        description: The value of the attribute
+                      type:
+                        type: string
+                        description: The data type of the attribute
+                        enum: [string, integer, boolean, array, object]
+                realTimeAttributes:
+                  type: object
+                  description: Current device status
+                  additionalProperties:
+                    type: object
+                    properties:
+                      value:
+                        type: string
+                        description: The value of the attribute
+                      type:
+                        type: string
+                        description: The data type of the attribute
+                        enum: [string, integer, boolean, array, object]
+                modifiableAttributes:
+                  type: object
+                  description: User-configurable settings
+                  additionalProperties:
+                    type: object
+                    properties:
+                      value:
+                        type: string
+                        description: The current value of the attribute
+                      type:
+                        type: string
+                        description: The data type of the attribute
+                        enum: [string, integer, boolean, array, object]
+                      allowedValues:
+                        type: array
+                        description: List of allowed values for this attribute
+                        items:
+                          type: string
+                          
+    OtaStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                inProgress:
+                  type: boolean
+                  description: Whether an update is currently in progress
+                  example: true
+                localDataProgress:
+                  type: integer
+                  description: Update progress percentage (0-100)
+                  example: 35
+                  minimum: 0
+                  maximum: 100
+                localDataStartTime:
+                  type: integer
+                  format: int64
+                  description: Timestamp when the update started
+                  example: 1648756321000
+                otaStatus:
+                  type: integer
+                  description: |
+                    Update status code:
+                    0 = Not started
+                    1 = Downloading
+                    2 = Installing
+                    3 = Complete
+                    4-5 = Error
+                  example: 1
+                  enum: [0, 1, 2, 3, 4, 5]
+                serialNumber:
+                  type: string
+                  description: Device serial number
+                  example: "ABC123XYZ"
+                status:
+                  type: integer
+                  description: General device status code
+                  example: 1
+                targetFirmware:
+                  type: string
+                  description: Target firmware version
+                  example: "v2.3.5"
+                totalSize:
+                  type: integer
+                  format: int64
+                  description: Total update size in bytes
+                  example: 15728640
+                transferredSize:
+                  type: integer
+                  format: int64
+                  description: Amount of data transferred so far in bytes
+                  example: 5505024
+                  
+    SingleDeviceResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: Unique identifier for the device
+                  example: 12345
+                serialNumber:
+                  type: string
+                  description: Device serial number
+                  example: "ABC123XYZ"
+                deviceName:
+                  type: string
+                  description: User-assigned device name
+                  example: "Front Door Camera"
+                modelName:
+                  type: string
+                  description: Device model name
+                  example: "VH100"
+                batteryLevel:
+                  type: integer
+                  description: Battery level percentage (0-100)
+                  example: 85
+                  minimum: 0
+                  maximum: 100
+                online:
+                  type: integer
+                  description: Online status (1=online, 0=offline)
+                  example: 1
+                  enum: [0, 1]
+                awake:
+                  type: integer
+                  description: Awake status (1=awake, 0=sleeping)
+                  example: 1
+                  enum: [0, 1]
+                isCharging:
+                  type: integer
+                  description: Charging status (1=charging, 0=not charging)
+                  example: 0
+                  enum: [0, 1]
+                locationId:
+                  type: integer
+                  description: Location identifier
+                  example: 789
+                locationName:
+                  type: string
+                  description: Location name
+                  example: "Home"
+                thumbImgTime:
+                  type: integer
+                  format: int64
+                  description: Timestamp of the thumbnail image
+                  example: 1648756321000
+                thumbImgUrl:
+                  type: string
+                  description: URL to the thumbnail image
+                  example: "https://cdn.vicohome.io/images/thumbnails/ABC123XYZ_1648756321.jpg"
+                sdCard:
+                  type: object
+                  description: SD card information
+                  properties:
+                    formatStatus:
+                      type: integer
+                      description: SD card format status code
+                      example: 1
+                    total:
+                      type: integer
+                      format: int64
+                      description: Total SD card capacity in bytes
+                      example: 32212254720
+                    used:
+                      type: integer
+                      format: int64
+                      description: Used SD card space in bytes
+                      example: 12458741760
+                hasAlarm:
+                  type: boolean
+                  description: Whether the device has alarm capabilities
+                  example: true
+                hasWebRTC:
+                  type: boolean
+                  description: Whether the device supports WebRTC streaming
+                  example: true
+                hasSleepMode:
+                  type: boolean
+                  description: Whether the device supports sleep mode
+                  example: true
+                hasFloodlight:
+                  type: boolean
+                  description: Whether the device has a floodlight
+                  example: false
+                firmwareVersion:
+                  type: string
+                  description: Current firmware version
+                  example: "v2.3.5"
+                needOta:
+                  type: boolean
+                  description: Whether a firmware update is available
+                  example: false
+                  
+    ListDeviceResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                list:
+                  type: array
+                  description: List of devices
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: Unique identifier for the device
+                        example: 12345
+                      serialNumber:
+                        type: string
+                        description: Device serial number
+                        example: "ABC123XYZ"
+                      deviceName:
+                        type: string
+                        description: User-assigned device name
+                        example: "Front Door Camera"
+                      online:
+                        type: integer
+                        description: Online status (1=online, 0=offline)
+                        example: 1
+                        enum: [0, 1]
+                      deviceModel:
+                        type: object
+                        description: Model information
+                        properties:
+                          id:
+                            type: integer
+                            description: Model identifier
+                            example: 8
+                          name:
+                            type: string
+                            description: Model name
+                            example: "VH100"
+                          category:
+                            type: integer
+                            description: Model category
+                            example: 1
+                      batteryLevel:
+                        type: integer
+                        description: Battery level percentage (0-100)
+                        example: 85
+                        minimum: 0
+                        maximum: 100
+                      deviceStatus:
+                        type: integer
+                        description: Device status code
+                        example: 1
+                      adminId:
+                        type: integer
+                        description: Device administrator user ID
+                        example: 54321
+                      adminName:
+                        type: string
+                        description: Device administrator name
+                        example: "John Doe"
+                      role:
+                        type: integer
+                        description: User's role for this device
+                        example: 1
+                      roleName:
+                        type: string
+                        description: User's role name
+                        example: "Owner"
+                      thumbImgUrl:
+                        type: string
+                        description: URL to the thumbnail image
+                        example: "https://cdn.vicohome.io/images/thumbnails/ABC123XYZ_1648756321.jpg"
+                      thumbImgTime:
+                        type: integer
+                        format: int64
+                        description: Timestamp of the thumbnail image
+                        example: 1648756321000
+                      sdCard:
+                        type: object
+                        description: SD card information
+                        properties:
+                          formatStatus:
+                            type: integer
+                            description: SD card format status code
+                            example: 1
+                          total:
+                            type: integer
+                            format: int64
+                            description: Total SD card capacity in bytes
+                            example: 32212254720
+                          used:
+                            type: integer
+                            format: int64
+                            description: Used SD card space in bytes
+                            example: 12458741760
+                      firmwareId:
+                        type: string
+                        description: Current firmware version
+                        example: "v2.3.5"
+                      needOta:
+                        type: boolean
+                        description: Whether a firmware update is available
+                        example: false
+                      locationId:
+                        type: integer
+                        description: Location identifier
+                        example: 789
+                      locationName:
+                        type: string
+                        description: Location name
+                        example: "Home"
+                      deviceSupport:
+                        type: object
+                        description: Device capabilities and features
+                        properties:
+                          hasAlarm:
+                            type: boolean
+                            description: Whether the device has alarm capabilities
+                            example: true
+                          hasWebRTC:
+                            type: boolean
+                            description: Whether the device supports WebRTC streaming
+                            example: true
+                          hasSleepMode:
+                            type: boolean
+                            description: Whether the device supports sleep mode
+                            example: true
+                          hasFloodlight:
+                            type: boolean
+                            description: Whether the device has a floodlight
+                            example: false
+                            
+    ListLocationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: List of locations
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Unique identifier for the location
+                    example: 789
+                  locationName:
+                    type: string
+                    description: Name of the location
+                    example: "Home"
+                  adminId:
+                    type: integer
+                    description: User ID of the location administrator
+                    example: 54321
+                  country:
+                    type: string
+                    description: Country name
+                    example: "United States"
+                  state:
+                    type: string
+                    description: State/province name
+                    example: "California"
+                  city:
+                    type: string
+                    description: City name
+                    example: "San Francisco"
+                  district:
+                    type: string
+                    description: District/area name
+                    example: "Mission District"
+                  streetAddress1:
+                    type: string
+                    description: Primary street address
+                    example: "123 Main St"
+                  streetAddress2:
+                    type: string
+                    description: Secondary street address
+                    example: "Apt 4B"
+                  postalCode:
+                    type: string
+                    description: Postal/ZIP code
+                    example: "94107"
+                  insertTime:
+                    type: integer
+                    format: int64
+                    description: Timestamp of creation
+                    example: 1617293000000
+                  isLocalData:
+                    type: boolean
+                    description: Flag indicating if this is local data
+                    example: false
+                  isSelected:
+                    type: boolean
+                    description: Flag indicating if this location is currently selected
+                    example: true
+                    
+    ListSleepPlanResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: List of sleep plans
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/DeviceSleepPlanBean'
+                  
+    PersonDetectionRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+            - userId
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "ABC123XYZ"
+            filterByAiAnalyze:
+              type: boolean
+              description: Whether to filter events by AI analysis capability
+              default: false
+            personDetect:
+              type: integer
+              description: Person detection setting value (if specified)
+              example: 1
+            userId:
+              type: integer
+              description: User identifier
+              example: 54321
+              
+    PersonDetectionResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: List of detection categories
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Detection category name
+                    example: "Person"
+                    enum: ["Person", "Package", "Pet", "Vehicle"]
+                  choice:
+                    type: boolean
+                    description: Whether notifications are enabled for this category
+                    example: true
+                  subEvent:
+                    type: array
+                    description: More granular detection categories
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Sub-category name
+                          example: "Familiar Face"
+                        choice:
+                          type: boolean
+                          description: Whether notifications are enabled for this sub-category
+                          example: true
+                          
+    ModifyDeviceAttributesRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+            - modifiableAttributes
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "ABC123XYZ"
+            modifiableAttributes:
+              type: array
+              description: List of attributes to modify
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Name of the attribute to modify
+                    example: "pirSensitivity"
+                  value:
+                    type: string
+                    description: |
+                      New value for the attribute. Value type depends on the attribute 
+                      being modified and will be converted to the appropriate type.
+                    example: "80"
+                    
+    QueryAiEventRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumbers:
+              type: array
+              description: List of device serial numbers to query (required unless isAll=true)
+              items:
+                type: string
+                example: "ABC123XYZ"
+            isAll:
+              type: boolean
+              description: Whether to query all devices
+              default: false
+              
+    QueryAiEventResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: List of devices with their AI event settings
+              items:
+                type: object
+                properties:
+                  serialNumber:
+                    type: string
+                    description: Device serial number
+                    example: "ABC123XYZ"
+                  deviceName:
+                    type: string
+                    description: Device name
+                    example: "Front Door Camera"
+                  list:
+                    type: array
+                    description: List of AI event objects
+                    items:
+                      type: object
+                      properties:
+                        eventObject:
+                          type: string
+                          description: Event object type
+                          example: "person"
+                          enum: ["person", "package", "pet", "vehicle"]
+                        checked:
+                          type: boolean
+                          description: Whether detection is enabled for this object type
+                          example: true
+                          
+    DeviceCloudVipResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                hasVip:
+                  type: boolean
+                  description: Whether the device has an active premium subscription
+                  example: true
+                vipTag:
+                  type: integer
+                  description: VIP level identifier
+                  example: 2
+                tierNameKey:
+                  type: string
+                  description: Subscription tier identifier
+                  example: "premium_tier_2"
+                endTime:
+                  type: integer
+                  format: int64
+                  description: Subscription expiration timestamp
+                  example: 1701388800000
+                freeLicenseId:
+                  type: integer
+                  description: ID for any free license
+                  example: 0
+                vipNotifyShow:
+                  type: boolean
+                  description: Whether to show VIP notifications
+                  example: true
+                tierList:
+                  type: array
+                  description: Available subscription options
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: Tier identifier
+                        example: 2
+                      name:
+                        type: string
+                        description: Tier name
+                        example: "Premium"
+                      price:
+                        type: number
+                        format: float
+                        description: Subscription price
+                        example: 9.99
+                      currency:
+                        type: string
+                        description: Price currency
+                        example: "USD"
+                      features:
+                        type: array
+                        description: List of features included in this tier
+                        items:
+                          type: string
+                          example: "30-day cloud storage"
+                          
+    UpdateEventObjectSwitchRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+            - list
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "ABC123XYZ"
+            list:
+              type: array
+              description: List of event objects to update
+              items:
+                type: object
+                required:
+                  - eventObject
+                  - checked
+                properties:
+                  eventObject:
+                    type: string
+                    description: Type of object to detect
+                    example: "person"
+                    enum: ["person", "package", "pet", "vehicle"]
+                  checked:
+                    type: boolean
+                    description: Whether detection is enabled for this object type
+                    example: true
+                    
+    EventRecordFilterRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - startTimestamp
+            - endTimestamp
+            - serialNumber
+          properties:
+            startTimestamp:
+              type: integer
+              format: int64
+              description: Start time for filtering events in milliseconds
+              example: 1648756321000
+            endTimestamp:
+              type: integer
+              format: int64
+              description: End time for filtering events in milliseconds
+              example: 1648842721000
+            serialNumber:
+              type: array
+              description: List of device serial numbers to filter by
+              items:
+                type: string
+                example: "ABC123XYZ"
+            from:
+              type: integer
+              description: Pagination start parameter
+              example: 0
+            to:
+              type: integer
+              description: Pagination end parameter
+              example: 20
+            tags:
+              type: array
+              description: Event tags to filter by
+              items:
+                type: string
+                example: "motion"
+            objectNames:
+              type: array
+              description: Detected object names to filter by
+              items:
+                type: string
+                example: "person"
+            marked:
+              type: integer
+              description: Filter by favorite status (0 or 1)
+              example: 0
+              enum: [0, 1]
+            missing:
+              type: integer
+              description: Filter by read/unread status
+              example: 0
+              enum: [0, 1]
+            serialNumberToActivityZone:
+              type: object
+              description: Maps serial numbers to activity zones
+              additionalProperties:
+                type: string
+                example: "zone1"
+            videoEventKey:
+              type: string
+              description: Key for specific video events
+              example: "key123"
+            isFromSDCard:
+              type: boolean
+              description: Whether to fetch from local storage
+              example: false
+              
+    EventRecordFilterResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                list:
+                  type: array
+                  description: List of recordings
+                  items:
+                    type: object
+                    properties:
+                      traceId:
+                        type: string
+                        description: Unique recording identifier
+                        example: "abc123def456"
+                      serialNumber:
+                        type: string
+                        description: Device serial number
+                        example: "ABC123XYZ"
+                      eventTime:
+                        type: integer
+                        format: int64
+                        description: Timestamp of event
+                        example: 1648756321000
+                      eventType:
+                        type: integer
+                        description: Type of event (numeric code)
+                        example: 1
+                      thumbnailUrl:
+                        type: string
+                        description: URL to thumbnail image
+                        example: "https://cdn.vicohome.io/thumbnails/abc123.jpg"
+                      videoUrl:
+                        type: string
+                        description: URL to video recording
+                        example: "https://cdn.vicohome.io/videos/abc123.mp4"
+                      duration:
+                        type: integer
+                        description: Recording length in seconds
+                        example: 15
+                      marked:
+                        type: integer
+                        description: Favorite status
+                        example: 0
+                        enum: [0, 1]
+                      read:
+                        type: integer
+                        description: Viewed status
+                        example: 0
+                        enum: [0, 1]
+                      activityZone:
+                        type: string
+                        description: Activity zone ID
+                        example: "zone1"
+                      detectedObjects:
+                        type: array
+                        description: List of detected objects
+                        items:
+                          type: string
+                          example: "person"
+                total:
+                  type: integer
+                  description: Total count of matching records
+                  example: 42
+                  
+    UpdateLocationEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - id
+            - adminId
+            - locationName
+            - country
+            - state
+            - city
+          properties:
+            id:
+              type: integer
+              description: Unique identifier for the location to update
+              example: 12345
+            adminId:
+              type: integer
+              description: User ID of the admin
+              example: 67890
+            locationName:
+              type: string
+              description: Name of the location
+              example: "Home"
+            country:
+              type: string
+              description: Country name
+              example: "US"
+            state:
+              type: string
+              description: State/province name
+              example: "California"
+            city:
+              type: string
+              description: City name
+              example: "San Francisco"
+            district:
+              type: string
+              description: District/area name
+              example: "Mission District"
+            streetAddress1:
+              type: string
+              description: Primary street address
+              example: "123 Main St"
+            streetAddress2:
+              type: string
+              description: Secondary street address
+              example: "Apt 4B"
+            postalCode:
+              type: string
+              description: Postal/ZIP code
+              example: "94107"
+            insertTime:
+              type: integer
+              description: Timestamp for insertion
+              example: 1617293000
+              
+    MegerPushEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - messageMergeSwitch
+          properties:
+            messageMergeSwitch:
+              type: integer
+              description: Notification merging preference (1 = merged, 0 = not merged)
+              example: 1
+              enum: [0, 1]
+              
+    PersonDetectionUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+            - eventObjectType
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number identifier
+              example: "ABC123XYZ"
+            eventObjectType:
+              type: object
+              description: Notification configuration for different object types
+              properties:
+                person:
+                  type: array
+                  description: List of person detection notification settings
+                  items:
+                    $ref: '#/components/schemas/DetectionCategory'
+                pet:
+                  type: array
+                  description: List of pet detection notification settings
+                  items:
+                    $ref: '#/components/schemas/DetectionCategory'
+                vehicle:
+                  type: array
+                  description: List of vehicle detection notification settings
+                  items:
+                    $ref: '#/components/schemas/DetectionCategory'
+                packageContent:
+                  type: array
+                  description: List of package detection notification settings
+                  items:
+                    $ref: '#/components/schemas/DetectionCategory'
+                other:
+                  type: array
+                  description: List of other detection notification settings
+                  items:
+                    $ref: '#/components/schemas/DetectionCategory'
+    
+    DetectionCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Detection category name
+          example: "Person"
+        choice:
+          type: boolean
+          description: Whether notifications are enabled for this category
+          example: true
+    FreeTierResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                freeTierEnabled:
+                  type: boolean
+                  description: Whether free tier services are enabled
+                  example: true
+                cloudStorageDays:
+                  type: integer
+                  description: Days of free cloud storage
+                  example: 7
+                freeTierFeatures:
+                  type: array
+                  description: Features included in the free tier
+                  items:
+                    type: string
+                    example: "7-day cloud storage"
+                trialEnabled:
+                  type: boolean
+                  description: Whether trial is available
+                  example: true
+                trialDurationDays:
+                  type: integer
+                  description: Trial duration in days
+                  example: 30
+                trialFeatures:
+                  type: array
+                  description: Features included in the trial
+                  items:
+                    type: string
+                    example: "30-day cloud storage"
+                    
+    MargePushSwitchResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                messageMergeSwitch:
+                  type: string
+                  description: Push notification merging setting (0=not merged, 1=merged)
+                  example: "1"
+                  enum: ["0", "1"]
+                userId:
+                  type: string
+                  description: User identifier
+                  example: "54321"
+                  
+    RotateCalibrationRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+            - needCalibration
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "ABC123XYZ"
+            needCalibration:
+              type: boolean
+              description: |
+                True to start calibration, false to check status.
+                When starting calibration, set to true. When checking status, set to false.
+              example: true
+              
+    RotateCalibrationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                calibrationFinished:
+                  type: boolean
+                  description: Whether the calibration process is complete
+                  example: false
+                  
+    SleepSwitchRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - serialNumber
+            - dormancySwitch
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "ABC123XYZ"
+            dormancySwitch:
+              type: integer
+              description: Sleep mode toggle (0=off, 1=on)
+              example: 1
+              enum: [0, 1]

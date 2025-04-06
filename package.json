@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "start": "openapi-editor --file ./openapi.yml --port 3000"
+  }
+}
