@@ -1,31 +1,13 @@
-# uploadGooglePayInfo Endpoint Documentation
+# Upload Google Pay Info API
 
-## Overview
-The `uploadGooglePayInfo` endpoint processes and verifies Google Pay payments for subscription purchases within the Vicohome app. This endpoint is responsible for validating purchase tokens with Google, recording transactions, and activating subscriptions.
-
-## API Details
+## Endpoint Details
 - **Path**: `/pay/google/order/verify`
 - **Method**: POST
-- **Base URL**: https://api-us.vicohome.io
+- **Content-Type**: application/json
+- **Description**: Processes Google Pay payments and activates subscriptions for selected devices
 
 ## Request Parameters
-The endpoint accepts an `OrderEntry` object that extends `BaseEntry` with the following fields:
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| productId | Integer | Yes | The product identifier for the subscription plan |
-| tradeType | Integer | Yes | Type of transaction (subscription or one-time) |
-| outTradeNo | String | Yes | Order number for tracking the transaction |
-| purchaseToken | String | Yes | Token received from Google Pay after user payment |
-| subscriptionGroupId | String | No | Group identifier for subscription |
-| tierDeviceList | Array | Yes | List of device identifiers to activate the subscription for |
-| guidanceSource | Integer | No | Source of purchase guidance/referral |
-| app | Object | Yes | Application information (inherited from BaseEntry) |
-| countryNo | String | Yes | Country code (e.g., "US") (inherited from BaseEntry) |
-| language | String | Yes | Language code (e.g., "en") (inherited from BaseEntry) |
-| tenantId | String | Yes | Tenant identifier (inherited from BaseEntry) |
-
-### Example Request Body
 ```json
 {
   "productId": 123,
@@ -47,21 +29,20 @@ The endpoint accepts an `OrderEntry` object that extends `BaseEntry` with the fo
 }
 ```
 
-## Response Structure
-The endpoint returns a `PayResultResponse` object that extends `BaseResponse`:
+### Required Fields
+- `productId`: Integer - The product identifier
+- `tradeType`: Integer - Type of transaction (subscription or one-time)
+- `outTradeNo`: String - Order number for tracking the transaction
+- `purchaseToken`: String - Token from Google Pay after payment
+- `tierDeviceList`: Array of Strings - Device identifiers to activate subscription for
+- Standard app and user context fields (app, countryNo, language, tenantId)
 
-### BaseResponse Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| result | Integer | Status code (0 for success, negative values indicate errors) |
-| msg | String | Status message or error description |
+### Optional Fields
+- `subscriptionGroupId`: String - Group identifier for subscription
+- `guidanceSource`: Integer - Source of purchase referral
 
-### PayResultResponse Additional Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| data | String | Additional response data, typically a confirmation identifier |
+## Response Format
 
-### Example Success Response
 ```json
 {
   "result": 0,
@@ -70,41 +51,24 @@ The endpoint returns a `PayResultResponse` object that extends `BaseResponse`:
 }
 ```
 
-### Example Error Response
-```json
-{
-  "result": -1001,
-  "msg": "Invalid payment token"
-}
-```
+### Success Response
+- `result`: 0
+- `msg`: "success"
+- `data`: String - Transaction identifier or confirmation ID
 
-## Error Codes
-| Code | Description |
-|------|-------------|
-| -1001 | Invalid payment token |
-| -1002 | Product not found |
-| -1003 | Transaction already processed |
-| -2001 | Network error |
-| -3001 | Server error during verification |
-| -4001 | Authentication error |
+### Error Responses
+- `result`: Negative value
+- `msg`: Error description message
+- Common error codes:
+  - `-1001`: Invalid product ID
+  - `-1002`: Invalid purchase token
+  - `-1003`: Transaction verification failed
+  - `-2001`: Network error
+  - `-4001`: Authentication error
 
-## Usage in Application
-The endpoint is called during the payment process:
-1. User selects a subscription plan and proceeds to checkout
-2. User completes payment through Google Pay
-3. Google Pay returns a purchase token to the app
-4. The app creates an OrderEntry with the token and device information
-5. The endpoint verifies the token with Google's servers
-6. Upon successful verification, the subscription is activated for the specified devices
-7. The app updates the UI to reflect the active subscription
-
-## Related Endpoints
-- `/vip/tier/list/v4` (getTierListV4) - Gets subscription tier options
-- `/vip/user/service/info` (getVipUserServiceInfo) - Gets VIP user service information after purchase
-
-## Constraints
-- User must be authenticated to access this endpoint
-- The purchaseToken must be valid and recently generated from Google Pay
-- The productId must correspond to a valid subscription product
-- The devices in tierDeviceList must belong to the authenticated user
-- The endpoint is specifically for Google Pay transactions on Android devices
+## Usage Notes
+- This endpoint is used to verify and process payments made through Google Pay
+- The request contains the purchase token obtained from Google Pay after payment
+- The transaction type (tradeType) determines whether this is a subscription or one-time purchase
+- Device IDs are provided to link the subscription to specific devices
+- After successful processing, the response includes a transaction ID for reference

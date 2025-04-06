@@ -206,32 +206,32 @@ apiGroups:
     status: verified
     endpoints:
       getPurchaseDevice:
-        status: verified
+        status: openapi
         description: Get purchase information for a device
         path: /vip/available/purchase/device
         method: POST
       getSim4gTierListV4:
-        status: verified
+        status: openapi
         description: Get 4G SIM card tier options
         path: /vip/tier/list/v4
         method: POST
       getTierListV4:
-        status: verified
+        status: openapi
         description: Get subscription tier options
         path: /vip/tier/list/v4
         method: POST
       getVipUserServiceInfo:
-        status: verified
+        status: openapi
         description: Get VIP user service information
         path: /vip/user/service/info
         method: POST
       queryVipDevicePosition:
-        status: verified
+        status: openapi
         description: Query VIP device positions
         path: /vip/user/device/list
         method: POST
       updateUserRollingDay:
-        status: verified
+        status: openapi
         description: Update user billing cycle day
         path: /vip/user/rolling/day
         method: POST

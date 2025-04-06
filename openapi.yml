@@ -1592,6 +1592,268 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+                
+  /vip/available/purchase/device:
+    post:
+      tags:
+        - Subscription Management
+      summary: Get purchase information for a device
+      description: |
+        Retrieves information about devices that are available for subscription purchase. 
+        It's used to determine which devices can be associated with a new subscription 
+        before proceeding with payment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseDeviceResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /vip/tier/list/v4:
+    post:
+      tags:
+        - Subscription Management
+      summary: Get subscription tier options
+      description: |
+        Retrieves a list of available subscription tiers and plans for Vicohome devices.
+        
+        This endpoint supports two different modes:
+        
+        1. Standard subscription tier options: When sending a basic BaseEntry request
+        2. 4G SIM subscription tier options: When sending a Vip4GRequest with tierServiceType parameter
+        
+        The endpoint provides comprehensive information about different subscription options 
+        including monthly and yearly plans, features, and pricing for both regular and 
+        4G-enabled devices.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/BaseEntry'
+                - $ref: '#/components/schemas/Vip4GRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TierListResponseV4'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /vip/user/service/info:
+    post:
+      tags:
+        - Subscription Management
+      summary: Get VIP user service information
+      description: |
+        Retrieves detailed information about a user's current VIP subscription services.
+        This includes information about active devices, service tiers, subscription durations,
+        billing information, and supported features.
+        
+        This endpoint supports two different modes:
+        
+        1. Standard subscription info: When sending a basic BaseEntry request
+        2. 4G subscription info: When sending a Vip4GRequest with tierServiceType parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/BaseEntry'
+                - $ref: '#/components/schemas/Vip4GRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VipServiceResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /vip/user/device/list:
+    post:
+      tags:
+        - Subscription Management
+      summary: Query VIP device positions
+      description: |
+        Retrieves information about the user's VIP subscription devices and their 
+        positions/statuses in the system. This endpoint provides details about 
+        which devices are activated under which subscription tiers and their current status.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VipManagerResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /vip/user/rolling/day:
+    post:
+      tags:
+        - Subscription Management
+      summary: Update user billing cycle day
+      description: |
+        Updates the billing cycle day for a user's VIP subscription service. This allows
+        users to select a preferred day of the month (1-28) for their subscription billing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollingDayEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /pay/google/order/verify:
+    post:
+      tags:
+        - Subscription Management
+        - Payment Processing
+      summary: Process Google Pay payments
+      description: |
+        Processes Google Pay payments and activates subscriptions for selected devices.
+        This endpoint verifies the payment with Google Pay and if successful, activates
+        the purchased subscription or product for the specified devices.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GooglePayOrderEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayResultResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
@@ -3171,6 +3433,450 @@ components:
           type: boolean
           description: Whether notifications are enabled for this category
           example: true
+          
+    ProductEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - productId
+          properties:
+            productId:
+              type: integer
+              description: The ID of the product/subscription plan to purchase
+              example: 123
+              
+    PurchaseDeviceResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                availableForPurchase:
+                  type: boolean
+                  description: Whether purchase is available for any device
+                  example: true
+                allSimThirdParty:
+                  type: boolean
+                  description: Flag related to SIM card/third-party connectivity
+                  example: false
+                deviceList:
+                  type: array
+                  description: List of devices available for subscription
+                  items:
+                    type: object
+                    properties:
+                      canChoose:
+                        type: boolean
+                        description: Whether the device can be selected for subscription
+                        example: true
+                      deviceName:
+                        type: string
+                        description: Name of the device
+                        example: "Front Door Camera"
+                      icon:
+                        type: string
+                        description: Device icon URL
+                        example: "https://cdn.vicohome.io/icons/camera_doorbell.png"
+                      serialNumber:
+                        type: string
+                        description: Device serial number
+                        example: "ABC123XYZ"
+                      isCheckout:
+                        type: boolean
+                        description: Whether the device is already checked out
+                        example: false
+                        
+    Vip4GRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - tierServiceType
+          properties:
+            tierServiceType:
+              type: integer
+              description: Type of tier service to retrieve (typically set to 1)
+              example: 1
+    
+    RollingDayEntry:
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          required:
+            - rollingDay
+            - userVipId
+          properties:
+            rollingDay:
+              type: integer
+              description: Day of month for billing cycle (1-28)
+              minimum: 1
+              maximum: 28
+              example: 15
+            userVipId:
+              type: integer
+              description: User's VIP subscription ID
+              example: 12345
+              
+    ProductListItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the product
+          example: 123
+        name:
+          type: string
+          description: Product name
+          example: "4G Basic Monthly"
+        price:
+          type: number
+          format: float
+          description: Product price
+          example: 9.99
+        currency:
+          type: string
+          description: Currency code
+          example: "USD"
+        periodType:
+          type: integer
+          description: Subscription period type (1=Monthly, 12=Yearly)
+          example: 1
+        features:
+          type: array
+          description: List of features included in this product
+          items:
+            type: string
+          example: ["Unlimited Data", "30-Day Video History"]
+        tier:
+          type: integer
+          description: Tier level
+          example: 1
+        discountPercentage:
+          type: number
+          format: float
+          description: Discount percentage if applicable
+          example: 16.67
+        originalPrice:
+          type: number
+          format: float
+          description: Original price before discount
+          example: 119.99
+          
+    TierListResponseV4:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                cloudFreeTrialDay:
+                  type: integer
+                  description: Number of days in the free trial period
+                  example: 30
+                commendProduct:
+                  type: array
+                  description: List of recommended standard subscription products
+                  items:
+                    $ref: '#/components/schemas/ProductListItem'
+                commendProduct4G:
+                  type: array
+                  description: List of recommended 4G subscription products
+                  items:
+                    $ref: '#/components/schemas/ProductListItem'
+                commendProduct4GHalfYearList:
+                  type: array
+                  description: List of recommended 6-month 4G subscription products
+                  items:
+                    $ref: '#/components/schemas/ProductListItem'
+                commendProduct4GYearList:
+                  type: array
+                  description: List of recommended annual 4G subscription products
+                  items:
+                    $ref: '#/components/schemas/ProductListItem'
+                copywriteDiff:
+                  type: object
+                  description: Contains subscription information and feature differences
+                hasBirdDevice:
+                  type: boolean
+                  description: Whether the user has a bird detection compatible device
+                  example: false
+                productExplain:
+                  type: array
+                  description: List of product explanations/descriptions
+                  items:
+                    type: string
+                tierList:
+                  type: object
+                  description: Contains tierV1List and tierV2List with monthly and yearly products
+                  properties:
+                    tierV1List:
+                      type: object
+                      properties:
+                        monthlyList:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/ProductListItem'
+                        yearlyList:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/ProductListItem'
+                    tierV2List:
+                      type: object
+                      properties:
+                        monthlyList:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/ProductListItem'
+                        yearlyList:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/ProductListItem'
+                tierReceive:
+                  type: boolean
+                  description: Whether the user can receive standard subscription offers
+                  example: true
+                tierReceive4G:
+                  type: boolean
+                  description: Whether the user can receive 4G subscription offers
+                  example: true
+                  
+    PaySupportDevice:
+      type: object
+      properties:
+        deviceId:
+          type: integer
+          description: Unique identifier for the device
+          example: 12345
+        deviceInfo:
+          type: object
+          properties:
+            deviceName:
+              type: string
+              description: User-assigned device name
+              example: "Front Door Camera"
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "ABC123XYZ" 
+            modelName:
+              type: string
+              description: Model name
+              example: "VH100"
+        icon:
+          type: string
+          description: URL to device icon
+          example: "https://cdn.vicohome.io/icons/camera_doorbell.png"
+        isSelected:
+          type: boolean
+          description: Whether the device is selected
+          example: true
+        order:
+          type: integer
+          description: Device order/priority
+          example: 1
+          
+    TierDescribe:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title of the tier description
+          example: "Premium Features"
+        describe:
+          type: string
+          description: Description of tier features
+          example: "30-day video history, AI detection"
+        url:
+          type: string
+          description: URL to more information
+          example: "https://vicohome.io/premium-features"
+          
+    VipServiceResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                notInTierDeviceList:
+                  type: array
+                  description: List of user's devices not included in the current subscription tier
+                  items:
+                    $ref: '#/components/schemas/PaySupportDevice'
+                notInTierDeviceThirdPartyList:
+                  type: array
+                  description: List of third-party devices not included in the current tier
+                  items:
+                    $ref: '#/components/schemas/PaySupportDevice'
+                outOfPlanKey:
+                  type: string
+                  description: Key indicating why a device is out of plan
+                  example: "exceed_limit"
+                rollingDay:
+                  type: integer
+                  description: Billing cycle day
+                  example: 15
+                serviceActiveDevice:
+                  type: object
+                  description: Information about the active subscription and associated devices
+                  properties:
+                    activeDeviceList:
+                      type: array
+                      description: List of devices activated under this subscription
+                      items:
+                        $ref: '#/components/schemas/PaySupportDevice'
+                    tierNameKey:
+                      type: string
+                      description: Key/name of the current subscription tier
+                      example: "premium"
+                    endTime:
+                      type: integer
+                      format: int64
+                      description: Timestamp when the subscription ends
+                      example: 1701388800000
+                    maxDeviceNum:
+                      type: integer
+                      description: Maximum number of devices allowed in this tier
+                      example: 5
+                    tierId:
+                      type: integer
+                      description: ID of the subscription tier
+                      example: 2
+                    billingCycleType:
+                      type: integer
+                      description: Type of billing cycle
+                      example: 1
+                    billingCycleDuration:
+                      type: integer
+                      description: Duration of the billing cycle
+                      example: 30
+                serviceAdditionList:
+                  type: array
+                  description: List of add-on services
+                  items:
+                    type: object
+                supportRollingDay:
+                  type: array
+                  description: List of supported billing cycle days
+                  items:
+                    type: integer
+                  example: [1, 15, 28]
+                tierDescribeList:
+                  type: array
+                  description: List of tier descriptions with titles and links
+                  items:
+                    $ref: '#/components/schemas/TierDescribe'
+                userVipId:
+                  type: integer
+                  description: Unique identifier for the user's VIP status
+                  example: 98765
+                  
+    VipDeviceListItem:
+      type: object
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number
+          example: "ABC123XYZ"
+        deviceName:
+          type: string
+          description: User-assigned device name
+          example: "Front Door Camera"
+        icon:
+          type: string
+          description: URL to device icon
+          example: "https://cdn.vicohome.io/icons/camera_doorbell.png"
+        smallIcon:
+          type: string
+          description: URL to device small icon
+          example: "https://cdn.vicohome.io/icons/small/camera_doorbell.png"
+        tierList:
+          type: string
+          description: List of tiers this device supports
+          example: "1,2,3"
+        tierName:
+          type: string
+          description: Name of the tier the device is in
+          example: "Premium"
+        userSn:
+          type: string
+          description: User's serial number
+          example: "USR123456"
+        iccid:
+          type: string
+          description: Integrated Circuit Card Identifier (for SIM devices)
+          example: ""
+        deviceStatus:
+          type: integer
+          description: Current status code of the device
+          example: 1
+        online:
+          type: integer
+          description: Online status (1 = online, 0 = offline)
+          example: 1
+        simThirdParty:
+          type: integer
+          description: Flag for third-party SIM status
+          example: 0
+        deviceStorageType:
+          type: integer
+          description: Type of storage used by the device
+          example: 2
+        viewType:
+          type: integer
+          description: UI view type for this device
+          example: 0
+          
+    VimManagerBean:
+      type: object
+      properties:
+        tierId:
+          type: integer
+          description: ID of the subscription tier
+          example: 2
+        tierName:
+          type: string
+          description: Display name of the subscription tier
+          example: "Premium"
+        tierNameKey:
+          type: string
+          description: Key/identifier for the tier name
+          example: "premium_tier"
+        maxDeviceNum:
+          type: integer
+          description: Maximum number of devices allowed in this tier
+          example: 5
+        customSupportAllDevice:
+          type: boolean
+          description: Whether all device types are supported in this tier
+          example: false
+        supportDeviceSnList:
+          type: array
+          description: List of serial numbers for supported devices
+          items:
+            type: string
+          example: ["VH100", "VH200", "VH300"]
+        activeDeviceList:
+          type: array
+          description: List of devices currently active in this tier
+          items:
+            $ref: '#/components/schemas/VipDeviceListItem'
+            
+    VipManagerResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: List of VimManagerBean objects with subscription tier information
+              items:
+                $ref: '#/components/schemas/VimManagerBean'
     FreeTierResponse:
       allOf:
         - $ref: '#/components/schemas/BaseResponse'
