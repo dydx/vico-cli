@@ -203,7 +203,7 @@ apiGroups:
         method: POST
 
   payment:
-    status: unverified
+    status: verified
     endpoints:
       getPurchaseDevice:
         status: verified
@@ -221,56 +221,86 @@ apiGroups:
         path: /vip/tier/list/v4
         method: POST
       getVipUserServiceInfo:
-        status: unverified
+        status: verified
         description: Get VIP user service information
+        path: /vip/user/service/info
+        method: POST
       queryVipDevicePosition:
-        status: unverified
+        status: verified
         description: Query VIP device positions
+        path: /vip/user/device/list
+        method: POST
       updateUserRollingDay:
-        status: unverified
+        status: verified
         description: Update user billing cycle day
+        path: /vip/user/rolling/day
+        method: POST
       uploadGooglePayInfo:
-        status: unverified
+        status: verified
         description: Process Google Pay payments
+        path: /pay/google/order/verify
+        method: POST
 
   library:
-    status: unverified
+    status: verified
     endpoints:
       closeP2PConnection:
-        status: unverified
+        status: verified
         description: Close peer-to-peer connection
+        path: /dc/rtcconnection/close
+        method: POST
       deleteRecord:
-        status: unverified
+        status: verified
         description: Delete videos/recordings
+        path: /library/deletelibrary/
+        method: POST
       getEventDetail:
-        status: unverified
+        status: verified
         description: Get details for an event
+        path: /library/newselectlibrary
+        method: POST
       getEventRecordByFilter:
         status: openapi
         description: Get recordings filtered by criteria
         path: /library/newselectlibrary/newevent
         method: POST
       getLibraryByTraceId:
-        status: unverified
+        status: verified
         description: Get library data by trace ID
+        path: /library/newselectsinglelibrary
+        method: POST
       getLibraryStatus:
-        status: unverified
+        status: verified
         description: Get library status
+        path: /library/librarystatus
+        method: POST
       openP2PConnection:
-        status: unverified
+        status: verified
         description: Open peer-to-peer connection
+        path: /dc/rtcconnection/open
+        method: POST
       queryUserActivityZone:
-        status: unverified
+        status: verified
         description: Query user activity zones
+        path: /device/queryUserActivityZone
+        method: GET
       queryVideoSearchOption:
-        status: unverified
+        status: verified
         description: Search for videos with options
+        path: /library/queryVideoSearchOption
+        method: POST
       queryVideoSearchOptionBySn:
-        status: unverified
+        status: verified
         description: Search for videos by serial number
+        path: /library/queryVideoSearchOptionBySn
+        method: POST
       setMarkStatus:
-        status: unverified
+        status: verified
         description: Set mark status for recordings
+        path: /library/updatemarked
+        method: POST
       setReadStatus:
-        status: unverified
+        status: verified
         description: Set read status for recordings
+        path: /library/updatemissing
+        method: POST
