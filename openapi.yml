@@ -3875,20 +3875,38 @@ components:
     
     AccountEntry:
       type: object
+      description: Login request parameters
       properties:
-        account:
+        email:
           type: string
-          description: Email address or phone number of the user
+          format: email
+          description: User's email address for email-based authentication
+          example: "user@example.com"
         password:
           type: string
-          description: Password for authentication
-        deviceUUID:
+          format: password
+          description: User's password for email-based authentication
+          example: "password123"
+        phone:
           type: string
-          description: Unique device identifier
-      required:
-        - account
-        - password
-        - deviceUUID
+          description: User's phone number for phone-based authentication
+          example: "+1234567890"
+        code:
+          type: string
+          description: Verification code for phone-based authentication
+          example: "123456"
+        loginType:
+          type: integer
+          description: |
+            Type of login:
+            - 0: Email/password login
+            - 1: Phone/code login
+          enum: [0, 1]
+          default: 0
+          example: 0
+      oneOf:
+        - required: [email, password, loginType]
+        - required: [phone, code, loginType]
     
     BaseResponse:
       type: object
