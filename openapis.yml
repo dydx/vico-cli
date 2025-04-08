@@ -4,14 +4,16 @@ children:
   - file: device.yml
     state: [complete]
   - file: location.yml
-    state: [started]
+    state: [complete]
   - file: notification.yml
-    state: []
+    state: [complete]
   - file: ai.yml
-    state: []
+    state: [complete]
   - file: vip.yml
-    state: []
+    state: [complete]
   - file: payment.yml
-    state: []
+    state: [complete]
   - file: account.yml
-    state: []
+    state: [complete]
+    
+# All OpenAPI specs have been successfully merged into openapi.yml
