@@ -1,0 +1,161 @@
+openapi: 3.0.0
+info:
+  title: VicoHome Livestreaming API
+  description: API for VicoHome device livestreaming and P2P connections
+  version: 1.0.0
+
+servers:
+  - url: https://api-us.vicohome.io
+    description: Production API server
+
+paths:
+  /dc/rtcconnection/open:
+    post:
+      tags:
+        - Livestreaming
+      summary: Open P2P connection for livestreaming
+      description: |
+        Opens or establishes P2P connections to devices by their serial numbers.
+        This endpoint is typically called before attempting to stream video or 
+        communicate directly with a device. The P2P connection must be established 
+        before real-time operations can be performed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SerialNumberListEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /dc/rtcconnection/close:
+    post:
+      tags:
+        - Livestreaming
+      summary: Close P2P connection for livestreaming
+      description: |
+        Closes peer-to-peer (P2P) connections for live streaming. This endpoint 
+        is typically called when the user exits the live streaming view, when the app 
+        is going to background, or when the streaming session needs to be terminated.
+        It releases resources associated with the connection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SerialNumberListEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    SerialNumberListEntry:
+      type: object
+      description: Request containing a list of device serial numbers
+      required:
+        - serialNumber
+      properties:
+        serialNumber:
+          type: array
+          description: List of device serial numbers
+          items:
+            type: string
+          example: ["DEVICE_SN_1", "DEVICE_SN_2"]
+        app:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Application type identifier
+              example: "android"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID
+          
+    BaseResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          description: Result code (0 for success)
+          example: 0
+        msg:
+          type: string
+          description: Message describing the result
+          example: "Success"
+      required:
+        - result
+        - msg
+        
+    ErrorResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          description: Error code
+          example: 400
+        msg:
+          type: string
+          description: Error message
+          example: "Invalid request parameters"
+      required:
+        - result
+        - msg

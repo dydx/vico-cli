@@ -2054,4 +2054,621 @@ components:
       required:
         - serialNumber
         - deviceName
-        - online
+        - online  /device/queryUserActivityZone:
+    post:
+      tags:
+        - Activity Zones
+      summary: Query user's activity zones across devices
+      description: |
+        Retrieves all activity zones defined across all devices for the current user.
+        Unlike the /device/getactivityzone endpoint which requires a specific device 
+        serial number, this endpoint retrieves zones across all devices. This is useful
+        for apps that need to consolidate zone information from multiple cameras.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAllActivityZonesResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/deviceBindInit:
+    post:
+      tags:
+        - Device Binding
+      summary: Initialize device binding process
+      description: |
+        Retrieves initialization information for a device during the binding process,
+        including device name, firmware status, and available locations. This is the 
+        first step in the device binding workflow.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceBindInitEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceBindInitResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/bindComplete:
+    post:
+      tags:
+        - Device Binding
+      summary: Complete device binding process
+      description: |
+        Notifies the server that a device binding step has been completed. It's part of 
+        the device setup process and helps track the progress of binding a device to a 
+        user account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindCompleteEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/bindcheck/step:
+    post:
+      tags:
+        - Device Binding
+      summary: Check binding step status
+      description: |
+        Checks the status of the device binding process. The client periodically polls
+        this endpoint to determine the current step of the device binding workflow.
+        The binding process is complete when deviceBindStep reaches "4" (DEVICE_INITED_OK).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindCheckStepEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BindCheckStepResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/getWebrtcTicket:
+    post:
+      tags:
+        - Livestreaming
+      summary: Get WebRTC ticket for streaming
+      description: |
+        Gets a WebRTC ticket for establishing a P2P connection with a device for live 
+        video streaming. The returned ticket includes ICE servers for establishing P2P 
+        connections and should be used by the client's WebRTC SDK to establish the connection.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SerialNoEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebrtcTicketResponse'
+        '400':
+          description: Invalid request or device offline
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+    UserAllActivityZonesResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          description: Result code (0 for success)
+          example: 0
+        msg:
+          type: string
+          description: Message describing the result
+          example: "Success"
+        data:
+          type: array
+          description: List of activity zones across all devices
+          items:
+            $ref: '#/components/schemas/ZoneBean'
+      required:
+        - result
+        - msg
+        
+    ZoneBean:
+      type: object
+      description: Information about an activity zone
+      properties:
+        id:
+          type: integer
+          description: Zone ID
+          example: 12345
+        serialNumber:
+          type: string
+          description: Device serial number
+          example: "ABC123456789"
+        zoneName:
+          type: string
+          description: Custom name of the zone
+          example: "Driveway"
+        zoneNameId:
+          type: integer
+          description: Zone name identifier
+          example: 0
+        vertices:
+          type: string
+          description: Coordinates defining the zone boundaries
+          example: "10,20,150,20,150,100,10,100"
+        needPush:
+          type: integer
+          description: Push notification setting (0=disabled, 1=enabled)
+          enum: [0, 1]
+          example: 1
+        needAlarm:
+          type: integer
+          description: Alarm setting (0=disabled, 1=enabled)
+          enum: [0, 1]
+          example: 0
+        needRecord:
+          type: integer
+          description: Recording setting (0=disabled, 1=enabled)
+          enum: [0, 1]
+          example: 1
+        modelCategory:
+          type: integer
+          description: Device model category
+          example: 0
+        deviceName:
+          type: string
+          description: Name of the device
+          example: "Front Door Camera"
+          
+    DeviceBindInitEntry:
+      type: object
+      description: Request parameters for initializing device binding
+      required:
+        - serialNumber
+      properties:
+        serialNumber:
+          type: string
+          description: The serial number of the device to bind
+          example: "ABC123456789"
+        bindType:
+          type: integer
+          description: The type of binding (0 or 1)
+          enum: [0, 1]
+          example: 0
+        app:
+          type: object
+          properties:
+            apiVersion:
+              type: string
+              description: API version
+              example: "1.0"
+            appName:
+              type: string
+              description: Application name
+              example: "VicoHome"
+            appType:
+              type: string
+              description: Application type
+              example: "Android"
+            bundle:
+              type: string
+              description: Bundle identifier
+              example: "com.vicoo.vicohome"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+          
+    DeviceBindInitResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          description: Result code (0 for success)
+          example: 0
+        msg:
+          type: string
+          description: Message describing the result
+          example: "Success"
+        data:
+          type: object
+          properties:
+            deviceName:
+              type: string
+              description: The device name
+              example: "Front Door Camera"
+            firmwareStatus:
+              type: integer
+              description: Firmware status code
+              example: 0
+            locationDOList:
+              type: array
+              description: List of available locations
+              items:
+                $ref: '#/components/schemas/LocationItem'
+            locationId:
+              type: integer
+              description: Default location ID
+              example: 123
+            newestFirmwareId:
+              type: string
+              description: The ID of the newest available firmware
+              example: "firmware-v2.0"
+            serialNumber:
+              type: string
+              description: The serial number of the device
+              example: "ABC123456789"
+      required:
+        - result
+        - msg
+        
+    LocationItem:
+      type: object
+      description: Information about a location
+      properties:
+        id:
+          type: integer
+          description: Location ID
+          example: 123
+        locationName:
+          type: string
+          description: Location name
+          example: "Living Room"
+        isSelected:
+          type: boolean
+          description: Whether this location is selected
+          example: false
+        isLocalData:
+          type: boolean
+          description: Whether this is local data
+          example: false
+          
+    BindCompleteEntry:
+      type: object
+      description: Request parameters for completing a binding step
+      required:
+        - operationId
+        - bindStep
+      properties:
+        operationId:
+          type: string
+          description: The unique operation ID for the binding process
+          example: "op-12345-abc"
+        bindStep:
+          type: integer
+          description: The binding step that has been completed
+          example: 3
+        app:
+          type: object
+          properties:
+            apiVersion:
+              type: string
+              description: API version
+              example: "1.0"
+            appName:
+              type: string
+              description: Application name
+              example: "VicoHome"
+            appType:
+              type: string
+              description: Application type
+              example: "Android"
+            bundle:
+              type: string
+              description: Bundle identifier
+              example: "com.vicoo.vicohome"
+            countlyId:
+              type: string
+              description: Countly analytics ID
+            env:
+              type: string
+              description: Environment
+              example: "prod"
+            tenantId:
+              type: string
+              description: Tenant identifier
+            timeZone:
+              type: string
+              description: User's timezone
+              example: "America/New_York"
+            version:
+              type: integer
+              description: Application version code
+              example: 123
+            versionName:
+              type: string
+              description: Application version name
+              example: "1.2.3"
+        countryNo:
+          type: string
+          description: Country code
+          example: "US"
+        language:
+          type: string
+          description: Language setting
+          example: "en"
+        tenantId:
+          type: string
+          description: Tenant identifier
+          
+    BindCheckStepEntry:
+      type: object
+      description: Request parameters for checking binding step status
+      required:
+        - operationId
+      properties:
+        operationId:
+          type: string
+          description: The ID of the binding operation
+          example: "op-12345-abc"
+        app:
+          type: object
+          properties:
+            appType:
+              type: string
+              description: Application type
+              example: "Android"
+            apiVersion:
+              type: string
+              description: API version
+              example: "1.0"
+            appName:
+              type: string
+              description: Application name
+              example: "VicoHome"
+            bundle:
+              type: string
+              description: Bundle identifier
+              example: "com.vicoo.vicohome"
+            countlyId:
+              type: string
+              description: Analytics ID
+            env:
+              type: string
+              description: Environment
+              example: "prod"
+            tenantId:
+              type: string
+              description: Tenant ID
+            timeZone:
+              type: string
+              description: Device timezone
+              example: "America/New_York"
+            version:
+              type: integer
+              description: App version code
+              example: 124
+            versionName:
+              type: string
+              description: App version name
+              example: "2.3.1"
+        countryNo:
+          type: string
+          description: Country code
+          example: "US"
+        language:
+          type: string
+          description: Language code
+          example: "en"
+        tenantId:
+          type: string
+          description: Tenant ID
+          
+    BindCheckStepResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          description: Result code (0 for success)
+          example: 0
+        msg:
+          type: string
+          description: Message describing the result
+          example: "Success"
+        data:
+          type: object
+          properties:
+            deviceBindStep:
+              type: string
+              description: Current binding step (1-4)
+              example: "3"
+            opretionId:
+              type: string
+              description: Operation ID (same as request)
+              example: "op-12345-abc"
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "ABC123456789"
+      required:
+        - result
+        - msg
+        
+    WebrtcTicketResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          description: Result code (0 for success)
+          example: 0
+        msg:
+          type: string
+          description: Message describing the result
+          example: "Success"
+        data:
+          type: object
+          properties:
+            traceId:
+              type: string
+              description: Unique identifier for the connection session
+              example: "webrtc-vdca1p-1234567890"
+            groupId:
+              type: string
+              description: Group identifier for the connection
+              example: "grp-vdca1p-1234567890"
+            role:
+              type: string
+              description: Role in the connection
+              example: "subscriber"
+            id:
+              type: string
+              description: Unique identifier
+              example: "usr-1234567890"
+            signalServer:
+              type: string
+              description: WebRTC signaling server URL
+              example: "wss://webrtc-signal.vicohome.io"
+            sign:
+              type: string
+              description: Authentication signature
+              example: "a1b2c3d4e5f6g7h8i9j0"
+            time:
+              type: string
+              description: Timestamp
+              example: "2023-04-15T12:34:56.789Z"
+            signalPingInterval:
+              type: integer
+              description: Interval for ping messages to keep connection alive
+              example: 10000
+            appStopLiveTimeout:
+              type: string
+              description: Timeout value for the app to stop the connection
+              example: "30000"
+            expirationTime:
+              type: integer
+              format: int64
+              description: When the ticket expires
+              example: 1681564496789
+            iceServer:
+              type: array
+              description: Array of ICE servers for WebRTC connection
+              items:
+                $ref: '#/components/schemas/IceServer'
+      required:
+        - result
+        - msg
+        
+    IceServer:
+      type: object
+      description: WebRTC ICE server configuration
+      properties:
+        url:
+          type: string
+          description: STUN/TURN server URL
+          example: "turn:turn.vicohome.io:3478?transport=udp"
+        username:
+          type: string
+          description: Authentication username for TURN
+          example: "vicohome-turn"
+        credential:
+          type: string
+          description: Authentication credential for TURN
+          example: "turn-credential-123"

@@ -15,5 +15,11 @@ children:
     state: [complete]
   - file: account.yml
     state: [complete]
+  - file: library.yml
+    state: [complete]
+  - file: livestreaming.yml
+    state: [complete]
+  - file: user.yml
+    state: [complete]
     
-# All OpenAPI specs have been successfully merged into openapi.yml
+# Merging progress: 10/10 files merged into openapi.yml

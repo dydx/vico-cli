@@ -117,6 +117,697 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/quickLoginCode:
+    post:
+      tags:
+        - Account Management
+      summary: Get login verification code
+      description: |
+        Requests a verification code for quick login via SMS.
+        This endpoint sends a verification code to the user's phone number
+        which can then be used for authentication instead of a password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginCodeRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Request too frequent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/retryLoginCode:
+    post:
+      tags:
+        - Account Management
+      summary: Retry getting login code when password is wrong
+      description: |
+        Requests a verification code as an alternative login method
+        when a user has entered an incorrect password during the login process.
+        This allows users to authenticate via a verification code instead.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetryLoginCodeRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Request too frequent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/checkconfirm:
+    post:
+      tags:
+        - Account Management
+      summary: Check verification code
+      description: |
+        Validates a verification code sent to a user's email or phone number.
+        This is used during various processes such as registration,
+        password reset, or account verification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckVerificationRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '410':
+          description: Code expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Request too frequent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/checkbindcontact:
+    post:
+      tags:
+        - Account Management
+      summary: Check verification code for binding phone/email
+      description: |
+        Validates a verification code sent to a user's email or phone number
+        specifically for the purpose of binding or changing contact information.
+        This is a security measure to ensure that the user has access to the
+        phone number or email address they are trying to bind to their account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckVerificationRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '410':
+          description: Code expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Request too frequent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/sendbindcontactcode:
+    post:
+      tags:
+        - Account Management
+      summary: Send verification code for binding phone/email
+      description: |
+        Sends a verification code to the provided phone number or email address
+        for the purpose of binding that contact information to a user account.
+        This allows users to securely add or change their contact information.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendBindContactCodeRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Request too frequent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/resetpswd:
+    post:
+      tags:
+        - Account Management
+      summary: Reset password
+      description: |
+        Resets a user's password using a verification code that was previously
+        sent to the user's email or phone. This endpoint is used to complete
+        the password reset process after the verification code has been sent
+        and the user has entered the code along with their new password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request or password requirements not met
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid verification code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '410':
+          description: Verification code expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/resetconfirm:
+    post:
+      tags:
+        - Account Management
+      summary: Send verification code for password reset
+      description: |
+        Sends a verification code to the user's email or phone number as part of
+        the password reset process. This is the first step in the password reset flow.
+        The verification code is then used with the /account/resetpswd endpoint
+        to complete the password reset.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationCodeRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Request too frequent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/registconfirm:
+    post:
+      tags:
+        - Account Management
+      summary: Send verification code for registration
+      description: |
+        Sends a verification code to the provided email or phone number as part of
+        the user registration process. This code is used to verify the user's
+        identity and their ownership of the contact method before account creation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationVerificationRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Request too frequent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/passwordvalidation:
+    post:
+      tags:
+        - Account Management
+      summary: Verify user password
+      description: |
+        Verifies a user's password without performing a full login action.
+        This endpoint is used to confirm the current user's password is correct
+        before proceeding with sensitive operations like changing account settings,
+        deleting accounts, or updating credentials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordValidationRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/register/:
+    post:
+      tags:
+        - Account Management
+      summary: Register new user account
+      description: |
+        Creates a new user account with either email or phone as the primary contact method.
+        Requires a verification code that must be obtained through the /account/registconfirm
+        endpoint first. On successful registration, returns authentication tokens and user information.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid verification code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email/phone already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '410':
+          description: Verification code expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /user/getaccountinfo:
+    post:
+      tags:
+        - Account Management
+      summary: Get user account information
+      description: |
+        Retrieves user account information including profile details, contact information 
+        (email/phone), and authentication token information. This endpoint is typically
+        called after successful login or when the user views their profile screen.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountInfoResponse'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /user/updatename:
+    post:
+      tags:
+        - Account Management
+      summary: Update user nickname
+      description: |
+        Updates the user's display name/nickname in their profile.
+        This allows users to change how their name appears in the
+        application and to other users.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NickNameEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /user/updatepassword:
+    post:
+      tags:
+        - Account Management
+      summary: Update user password
+      description: |
+        Allows users to change their account password. It requires both the 
+        old password and the new password to be provided, and it performs validation 
+        to ensure the new password meets security requirements. After a successful 
+        password change, a new authentication token is issued.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordUpdateEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordUpdateResponse'
+        '400':
+          description: Invalid request or password format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Incorrect old password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /user/cancellation:
+    post:
+      tags:
+        - Account Management
+      summary: Delete user account
+      description: |
+        Permanently deletes a user's account and all associated data. This is the final 
+        step in the account deletion process after the user has verified their identity 
+        and confirmed their intention to delete the account. This action is irreversible.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /user/accountlinkedplatforms:
+    post:
+      tags:
+        - Account Management
+      summary: Get user's linked platform accounts
+      description: |
+        Retrieves a list of third-party platforms (like voice assistants or smart home systems) 
+        that have been linked to the user's account. This information is used to determine which 
+        platform-specific features should be displayed to the user and what integrations are available.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkedPlatformsResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /user/setusertoken:
+    post:
+      tags:
+        - Account Management
+      summary: Set push notification token for user
+      description: |
+        Registers or updates a device's push notification token for a user's account.
+        It associates the token with the user so that the server can send push notifications
+        to their device for events like motion detection, person detection, and other camera alerts.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: User not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
@@ -249,3 +940,573 @@ components:
         - code
         - data
         - message
+        
+    LoginCodeRequest:
+      type: object
+      description: Request parameters for SMS verification code
+      properties:
+        phone:
+          type: string
+          description: User's phone number
+          example: "+15551234567"
+        loginType:
+          type: integer
+          description: |
+            Type of login:
+            - 2: Phone login with verification code
+          enum: [2]
+          default: 2
+          example: 2
+      required:
+        - phone
+        
+    RetryLoginCodeRequest:
+      type: object
+      description: Request for verification code after failed password login
+      oneOf:
+        - required: [loginType, email]
+        - required: [loginType, phone]
+      properties:
+        loginType:
+          type: integer
+          description: |
+            Type of login:
+            - 1: Email login
+            - 2: Phone login
+          enum: [1, 2]
+          example: 1
+        email:
+          type: string
+          format: email
+          description: User's email address (required if loginType=1)
+          example: "user@example.com"
+        phone:
+          type: string
+          description: User's phone number (required if loginType=2)
+          example: "+15551234567"
+          
+    CheckVerificationRequest:
+      type: object
+      description: Request to validate a verification code
+      required:
+        - code
+      oneOf:
+        - required: [email]
+        - required: [phone]
+      properties:
+        code:
+          type: string
+          description: The verification code sent to user's email or phone
+          example: "123456"
+        email:
+          type: string
+          format: email
+          description: User's email address if code was sent via email
+          example: "user@example.com"
+        phone:
+          type: string
+          description: User's phone number if code was sent via SMS
+          example: "+15551234567"
+          
+    SendBindContactCodeRequest:
+      type: object
+      description: Request to send a verification code for binding a phone or email
+      oneOf:
+        - required: [email]
+        - required: [phone]
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address to bind to the user account
+          example: "user@example.com"
+        phone:
+          type: string
+          description: Phone number to bind to the user account
+          example: "+15551234567"
+        loginType:
+          type: integer
+          description: |
+            Type of login:
+            - 1: Email verification
+            - 2: Phone verification
+          enum: [1, 2]
+          example: 1
+        requestId:
+          type: string
+          description: Optional request identifier for tracking
+          example: "req-123456"
+          
+    ResetPasswordRequest:
+      type: object
+      description: Request to reset a user's password
+      required:
+        - code
+        - password
+      oneOf:
+        - required: [email]
+        - required: [phone]
+      properties:
+        code:
+          type: string
+          description: Verification code sent to the user's email or phone
+          example: "123456"
+        password:
+          type: string
+          format: password
+          description: |
+            New password, must meet the following requirements:
+            - At least 8 characters
+            - At least one uppercase letter
+            - At least one lowercase letter
+          example: "NewPassword123"
+        email:
+          type: string
+          format: email
+          description: User's email address if code was sent via email
+          example: "user@example.com"
+        phone:
+          type: string
+          description: User's phone number if code was sent via SMS
+          example: "+15551234567"
+          
+    VerificationCodeRequest:
+      type: object
+      description: Request to send a verification code for password reset
+      oneOf:
+        - required: [email]
+        - required: [phone]
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address to send verification code to
+          example: "user@example.com"
+        phone:
+          type: string
+          description: User's phone number to send verification code to
+          example: "+15551234567"
+        language:
+          type: string
+          description: User's preferred language for the message
+          example: "en"
+        requestId:
+          type: string
+          description: Optional request identifier for tracking
+          example: "req-123456"
+          
+    RegistrationVerificationRequest:
+      type: object
+      description: Request to send a verification code for user registration
+      required:
+        - loginType
+      oneOf:
+        - required: [email]
+        - required: [phone]
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address to register with
+          example: "user@example.com"
+        phone:
+          type: string
+          description: Phone number to register with
+          example: "+15551234567"
+        loginType:
+          type: integer
+          description: |
+            Type of login:
+            - 1: Email registration
+            - 2: Phone registration
+          enum: [1, 2]
+          example: 1
+        language:
+          type: string
+          description: User's preferred language for the message
+          example: "en"
+          
+    PasswordValidationRequest:
+      type: object
+      description: Request to verify the current user's password
+      required:
+        - oldPassword
+      properties:
+        oldPassword:
+          type: string
+          format: password
+          description: The password to verify
+          example: "Password123"
+        app:
+          type: object
+          description: Application information (optional)
+        countryNo:
+          type: string
+          description: Country code (optional)
+          example: "US"
+        language:
+          type: string
+          description: Language preference (optional)
+          example: "en"
+        tenantId:
+          type: string
+          description: Tenant ID for the system (optional)
+          
+    RegisterRequest:
+      type: object
+      description: Request to register a new user account
+      required:
+        - code
+        - password
+        - name
+      oneOf:
+        - required: [email]
+        - required: [phone]
+      properties:
+        code:
+          type: string
+          description: Verification code received via email or SMS
+          example: "123456"
+        email:
+          type: string
+          format: email
+          description: Email address (required if registering with email)
+          example: "user@example.com"
+        phone:
+          type: string
+          description: Phone number (required if registering with phone)
+          example: "+15551234567"
+        password:
+          type: string
+          format: password
+          description: Account password
+          example: "securePassword123"
+        name:
+          type: string
+          description: User's display name/nickname
+          example: "John Doe"
+        supportFreeLicense:
+          type: boolean
+          description: Whether to enable free trial features
+          example: true
+        app:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Application type identifier
+              example: "android"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID
+          
+    RegisterResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          description: Response code (0 indicates success)
+        message:
+          type: string
+          example: "Success"
+          description: Response message
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Unique identifier for the user
+              example: 123456
+            name:
+              type: string
+              description: User's display name
+              example: "John Doe"
+            email:
+              type: string
+              format: email
+              description: User's email address (if registered with email)
+              example: "user@example.com"
+            phone:
+              type: string
+              description: User's phone number (if registered with phone)
+              example: "+15551234567"
+            node:
+              type: string
+              description: Server node information
+              example: "us-east-1"
+            token:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Authentication token for subsequent API calls
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                tokentype:
+                  type: string
+                  description: Token type
+                  example: "Bearer"
+      required:
+        - code
+        - message
+        
+    AccountInfoResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          example: 0
+          description: Result code (0 indicates success)
+        msg:
+          type: string
+          example: "Success"
+          description: Response message
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Unique identifier for the user
+              example: 123456
+            name:
+              type: string
+              description: User's display name/nickname
+              example: "John Doe"
+            email:
+              type: string
+              format: email
+              description: User's email address (if registered with email)
+              example: "user@example.com"
+            phone:
+              type: string
+              description: User's phone number (if registered with phone)
+              example: "+15551234567"
+            node:
+              type: string
+              description: Server node information
+              example: "us-east-1"
+            token:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Authentication token for API calls
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                tokentype:
+                  type: string
+                  description: Token type
+                  example: "Bearer"
+            trackerToken:
+              type: string
+              description: Token used for user tracking (optional)
+              example: "abc123def456"
+      required:
+        - result
+        - msg
+        
+    NickNameEntry:
+      type: object
+      description: Request to update the user's display name
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The new display name for the user
+          example: "John Smith"
+        app:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Application type identifier
+              example: "android"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID
+          
+    PasswordUpdateEntry:
+      type: object
+      description: Request to update the user's password
+      required:
+        - oldPassword
+        - newPassword
+      properties:
+        oldPassword:
+          type: string
+          format: password
+          description: The user's current password
+          example: "CurrentPassword123"
+        newPassword:
+          type: string
+          format: password
+          description: |
+            The new password to set. Must meet the following requirements:
+            - At least 8 characters long
+            - Contains at least one lowercase letter
+            - Contains at least one uppercase letter
+          example: "NewPassword456"
+        app:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Application type identifier
+              example: "android"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID
+          
+    PasswordUpdateResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          example: 0
+          description: Result code (0 indicates success)
+        msg:
+          type: string
+          example: "Success"
+          description: Response message
+        data:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Unique identifier for the user
+              example: 123456
+            name:
+              type: string
+              description: User's display name
+              example: "John Doe"
+            email:
+              type: string
+              format: email
+              description: User's email address (if registered with email)
+              example: "user@example.com"
+            phone:
+              type: string
+              description: User's phone number (if registered with phone)
+              example: "+15551234567"
+            node:
+              type: string
+              description: Server node information
+              example: "us-east-1"
+            token:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Updated authentication token
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                tokentype:
+                  type: string
+                  description: Token type
+                  example: "Bearer"
+            trackerToken:
+              type: string
+              description: Token used for user tracking (optional)
+              example: "abc123def456"
+      required:
+        - result
+        - msg
+        
+    LinkedPlatformsResponse:
+      type: object
+      properties:
+        result:
+          type: integer
+          example: 0
+          description: Result code (0 indicates success)
+        msg:
+          type: string
+          example: "Success"
+          description: Response message
+        data:
+          type: object
+          properties:
+            linkedPlatforms:
+              type: array
+              description: List of third-party platforms linked to the user's account
+              items:
+                type: string
+                description: Platform name
+              example: ["Alexa", "Google Assistant"]
+      required:
+        - result
+        - msg
+        
+    TokenEntry:
+      type: object
+      description: Request to set or update a push notification token
+      required:
+        - msgType
+        - msgToken
+      properties:
+        msgType:
+          type: string
+          description: The type of push notification service
+          enum: ["FCM", "APNS"]
+          example: "FCM"
+        msgToken:
+          type: string
+          description: The actual push notification token obtained from the device's push notification service
+          example: "cNR9qIzSSomwn8HJLZlmN9:APA91bEYH6DSFvmZ5XGDvD1MEGNs..."
+        app:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Application type identifier
+              example: "android"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID

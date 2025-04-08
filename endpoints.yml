@@ -243,3 +243,233 @@ groups:
         description: Query free tier status
         state: openapi
         file: vip.yml
+        
+  - name: account
+    description: Account management endpoints
+    state: openapi
+    endpoints:
+      - path: /account/login
+        method: POST
+        description: Authenticate user
+        state: openapi
+        file: account.yml
+      - path: /account/logout/
+        method: POST
+        description: Terminate user session
+        state: openapi
+        file: account.yml
+      - path: /account/getipinfo
+        method: GET
+        description: Get IP address information
+        state: openapi
+        file: account.yml
+      - path: /account/quickLoginCode
+        method: POST
+        description: Get login verification code
+        state: openapi
+        file: account.yml
+      - path: /account/retryLoginCode
+        method: POST
+        description: Retry getting login code when password is wrong
+        state: openapi
+        file: account.yml
+      - path: /account/checkconfirm
+        method: POST
+        description: Check verification code
+        state: openapi
+        file: account.yml
+      - path: /account/checkbindcontact
+        method: POST
+        description: Check verification code for binding phone/email
+        state: openapi
+        file: account.yml
+      - path: /account/sendbindcontactcode
+        method: POST
+        description: Send verification code for binding phone/email
+        state: openapi
+        file: account.yml
+      - path: /account/resetpswd
+        method: POST
+        description: Reset password
+        state: openapi
+        file: account.yml
+      - path: /account/resetconfirm
+        method: POST
+        description: Send verification code for password reset
+        state: openapi
+        file: account.yml
+      - path: /account/registconfirm
+        method: POST
+        description: Send verification code for registration
+        state: openapi
+        file: account.yml
+      - path: /account/passwordvalidation
+        method: POST
+        description: Verify password
+        state: openapi
+        file: account.yml
+      - path: /account/register/
+        method: POST
+        description: Register new user account
+        state: openapi
+        file: account.yml
+      - path: /user/getaccountinfo
+        method: POST
+        description: Get user account information
+        state: openapi
+        file: account.yml
+      - path: /user/updatename
+        method: POST
+        description: Update user nickname
+        state: openapi
+        file: account.yml
+      - path: /user/updatepassword
+        method: POST
+        description: Update user password
+        state: openapi
+        file: account.yml
+      - path: /user/cancellation
+        method: POST
+        description: Delete user account
+        state: openapi
+        file: account.yml
+      - path: /user/accountlinkedplatforms
+        method: POST
+        description: Get user's linked platform accounts
+        state: openapi
+        file: account.yml
+      - path: /user/setusertoken
+        method: POST
+        description: Set push notification token for user
+        state: openapi
+        file: account.yml
+        
+  - name: library
+    description: Recording library management endpoints
+    state: openapi
+    endpoints:
+      - path: /library/deletelibrary/
+        method: POST
+        description: Delete recording
+        state: openapi
+        file: library.yml
+      - path: /library/newselectlibrary
+        method: POST
+        description: Get event details
+        state: openapi
+        file: library.yml
+      - path: /library/newselectlibrary/newevent
+        method: POST
+        description: Get event recordings by filter
+        state: openapi
+        file: library.yml
+      - path: /library/newselectsinglelibrary
+        method: POST
+        description: Get library by trace ID
+        state: openapi
+        file: library.yml
+      - path: /library/librarystatus
+        method: POST
+        description: Get library status
+        state: openapi
+        file: library.yml
+      - path: /library/queryVideoSearchOption
+        method: POST
+        description: Query video search options
+        state: openapi
+        file: library.yml
+      - path: /library/queryVideoSearchOptionBySn
+        method: POST
+        description: Query video search options by serial number
+        state: openapi
+        file: library.yml
+      - path: /library/updatemarked
+        method: POST
+        description: Set mark status
+        state: openapi
+        file: library.yml
+      - path: /library/updatemissing
+        method: POST
+        description: Set read status
+        state: openapi
+        file: library.yml
+      - path: /library/othertagnamelist
+        method: POST
+        description: Get filter tag list
+        state: openapi
+        file: library.yml
+      - path: /library/getQuestionBackOptionsV2
+        method: POST
+        description: Get library feedback options
+        state: openapi
+        file: library.yml
+      - path: /library/freeuser/banner
+        method: POST
+        description: Query payment banner
+        state: openapi
+        file: library.yml
+      - path: /library/freeuser/banner/close
+        method: POST
+        description: Report banner shown
+        state: openapi
+        file: library.yml
+      - path: /library/commitQuestionBack
+        method: POST
+        description: Upload feedback information
+        state: openapi
+        file: library.yml
+        
+  - name: livestreaming
+    description: P2P connection and streaming endpoints
+    state: openapi
+    endpoints:
+      - path: /dc/rtcconnection/open
+        method: POST
+        description: Open P2P connection for livestreaming
+        state: openapi
+        file: livestreaming.yml
+      - path: /dc/rtcconnection/close
+        method: POST
+        description: Close P2P connection for livestreaming
+        state: openapi
+        file: livestreaming.yml
+      
+  - name: additional_device
+    description: Additional device management endpoints
+    state: openapi
+    endpoints:
+      - path: /device/queryUserActivityZone
+        method: POST
+        description: Query user's activity zones across devices
+        state: openapi
+        file: device.yml
+      - path: /device/deviceBindInit
+        method: POST
+        description: Initialize device binding process
+        state: openapi
+        file: device.yml
+      - path: /device/bindComplete
+        method: POST
+        description: Complete device binding process
+        state: openapi
+        file: device.yml
+      - path: /device/bindcheck/step
+        method: POST
+        description: Check binding step status
+        state: openapi
+        file: device.yml
+      - path: /device/getWebrtcTicket
+        method: POST
+        description: Get WebRTC ticket for streaming
+        state: openapi
+        file: device.yml
+        
+  - name: user_tags
+    description: User targeting and A/B testing endpoints
+    state: openapi
+    endpoints:
+      - path: /api/userTag
+        method: POST
+        description: Get user bucket parameters for A/B testing
+        state: openapi
+        file: user.yml
