@@ -3,10 +3,6 @@ info:
   title: VicoHome API
   description: Complete API for VicoHome platform
   version: 1.0.0
-  contact:
-    name: VicoHome Support
-    url: https://vicohome.io/support
-    email: support@vicohome.io
 
 servers:
   - url: https://api-us.vicohome.io
