@@ -6367,7 +6367,9 @@ components:
                     example: "$5.99"
       required:
         - result
-        - msg    SerialNumberListEntry:
+        - msg
+        
+    SerialNumberListEntry:
       type: object
       description: Request containing a list of device serial numbers
       required:
@@ -6400,7 +6402,9 @@ components:
           example: "en"
         tenantId:
           type: string
-          description: User's tenant ID    BucketResponse:
+          description: User's tenant ID
+          
+    BucketResponse:
       type: object
       properties:
         result:
