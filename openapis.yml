@@ -1,0 +1,15 @@
+# OpenAPI Spec Merging Progress
+target: openapi.yml
+children:
+  - file: device.yml
+    state: [started]
+  - file: location.yml
+    state: []
+  - file: notification.yml
+    state: []
+  - file: ai.yml
+    state: []
+  - file: vip.yml
+    state: []
+  - file: payment.yml
+    state: []

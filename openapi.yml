@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: VicoHome API
+  description: Complete API for VicoHome platform
+  version: 1.0.0
+  contact:
+    name: VicoHome Support
+    url: https://vicohome.io/support
+    email: support@vicohome.io
+
+servers:
+  - url: https://api-us.vicohome.io
+    description: Production API server
+
+paths:
+  # Paths will be merged from individual files
+
+components:
+  schemas:
+    # Common schemas will be defined here
+    # More schemas will be merged from individual files
+    
+    # Core request/response objects that are used across multiple API groups
+    BaseEntry:
+      type: object
+      properties:
+        app:
+          type: object
+          properties:
+            apiVersion:
+              type: string
+              description: API version
+              example: "1.0"
+            appName:
+              type: string
+              description: Application name
+              example: "VicoHome"
+            appType:
+              type: string
+              description: Application type identifier
+              example: "android"
+            bundle:
+              type: string
+              description: Bundle identifier
+              example: "com.vicohome.app"
+            countlyId:
+              type: string
+              description: Analytics ID
+              example: "abc123"
+            env:
+              type: string
+              description: Environment
+              example: "prod"
+            tenantId:
+              type: string
+              description: Tenant identifier
+              example: "default"
+            timeZone:
+              type: string
+              description: User's timezone
+              example: "America/Los_Angeles"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+            versionName:
+              type: string
+              description: Application version name
+              example: "1.2.3"
+          required:
+            - appType
+            - version
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID
+          example: "default"
+      required:
+        - app
+        
+    BaseResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response code
+          example: "0"
+        msg:
+          type: string
+          description: Response message
+          example: "Success"
+      required:
+        - code
