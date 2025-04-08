@@ -91,155 +91,155 @@ groups:
 
   - name: ai_features
     description: AI detection and event settings
-    state: verified
+    state: openapi
     endpoints:
       - path: /aiAssist/queryEventObjectSwitch
         method: POST
         description: Query AI event detection settings
-        state: verified
+        state: openapi
         file: ai.yml
       - path: /aiAssist/updateEventObjectSwitch
         method: POST
         description: Update AI event detection settings
-        state: verified
+        state: openapi
         file: ai.yml
       - path: /birdLovers/queryBirdAiSetting
         method: POST
         description: Query bird AI settings
-        state: verified
+        state: openapi
         file: ai.yml
       - path: /birdLovers/updateBirdAiSetting
         method: POST
         description: Update bird AI settings
-        state: verified
+        state: openapi
         file: ai.yml
       - path: /device/queryMessageNotification/v1
         method: POST
         description: Query person detection details
-        state: verified
+        state: openapi
         file: ai.yml
       - path: /device/updateMessageNotification/v1
         method: POST
         description: Update person detection settings
-        state: verified
+        state: openapi
         file: ai.yml
 
   - name: location
     description: Location management endpoints
-    state: verified
+    state: openapi
     endpoints:
       - path: /location/listlocation
         method: POST
         description: List locations
-        state: verified
+        state: openapi
         file: location.yml
       - path: /location/insertlocation/
         method: POST
         description: Add location
-        state: verified
+        state: openapi
         file: location.yml
       - path: /location/updatelocationinfo
         method: POST
         description: Update location
-        state: verified
+        state: openapi
         file: location.yml
       - path: /location/deletelocation
         method: POST
         description: Delete location
-        state: verified
+        state: openapi
         file: location.yml
 
   - name: dormancy
     description: Sleep/Dormancy schedule management
-    state: verified
+    state: openapi
     endpoints:
       - path: /device/dormancy/list
         method: POST
         description: List sleep plans
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/dormancy/create
         method: POST
         description: Create sleep plan
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/dormancy/edit
         method: POST
         description: Edit sleep plan
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/dormancy/delete
         method: POST
         description: Delete sleep plan
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/dormancy/switch
         method: POST
         description: Toggle sleep plan on/off
-        state: verified
+        state: openapi
         file: device.yml
 
   - name: notification
     description: Notification and alert settings
-    state: verified
+    state: openapi
     endpoints:
       - path: /usersetting/queryswitch
         method: POST
         description: Query merged push notification settings
-        state: verified
+        state: openapi
         file: notification.yml
       - path: /usersetting/switch
         method: POST
         description: Update merged push notification settings
-        state: verified
+        state: openapi
         file: notification.yml
       - path: /device/mechanical/dingdong/audition
         method: POST
         description: Test audition/doorbell sound
-        state: verified
+        state: openapi
         file: notification.yml
 
   - name: vip
     description: VIP/Subscription management
-    state: verified
+    state: openapi
     endpoints:
       - path: /vip/device/cloud/info
         method: POST
         description: Query device cloud service VIP info
-        state: verified
+        state: openapi
         file: vip.yml
       - path: /vip/tier/list/v4
         method: GET
         description: Get subscription tier list
-        state: verified
+        state: openapi
         file: vip.yml
       - path: /vip/user/service/info
         method: POST
         description: Get VIP user service info
-        state: verified
+        state: openapi
         file: vip.yml
       - path: /vip/user/device/list
         method: POST
         description: List devices with VIP status
-        state: verified
+        state: openapi
         file: vip.yml
       - path: /vip/user/rolling/day
         method: POST
         description: Update user rolling day
-        state: verified
+        state: openapi
         file: vip.yml
       - path: /vip/available/purchase/device
         method: POST
         description: Get purchasable devices
-        state: verified
+        state: openapi
         file: vip.yml
       - path: /pay/google/order/verify
         method: POST
         description: Verify Google Pay order information
-        state: verified
+        state: openapi
         file: payment.yml
       - path: /user/queryFreeTier
         method: POST
         description: Query free tier status
-        state: verified
+        state: openapi
         file: vip.yml

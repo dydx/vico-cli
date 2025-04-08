@@ -134,26 +134,16 @@ components:
           format: password
           description: User's password for email-based authentication
           example: "password123"
-        phone:
-          type: string
-          description: User's phone number for phone-based authentication
-          example: "+1234567890"
-        code:
-          type: string
-          description: Verification code for phone-based authentication
-          example: "123456"
         loginType:
           type: integer
           description: |
             Type of login:
             - 0: Email/password login
-            - 1: Phone/code login
           enum: [0, 1]
           default: 0
           example: 0
       oneOf:
         - required: [email, password, loginType]
-        - required: [phone, code, loginType]
     
     LoginResponse:
       type: object

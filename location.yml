@@ -1,0 +1,422 @@
+openapi: 3.0.0
+info:
+  title: VicoHome Location API
+  description: API for VicoHome location management
+  version: 1.0.0
+
+servers:
+  - url: https://api-us.vicohome.io
+    description: Production API server
+
+paths:
+  /location/listlocation:
+    post:
+      tags:
+        - Location Management
+      summary: List locations
+      description: Retrieves a list of all locations created by the user
+      operationId: listLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllLocationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /location/insertlocation/:
+    post:
+      tags:
+        - Location Management
+      summary: Add location
+      description: Creates a new location for organizing devices
+      operationId: insertLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationInsertResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /location/updatelocationinfo:
+    post:
+      tags:
+        - Location Management
+      summary: Update location
+      description: Updates an existing location's information
+      operationId: updateLocationInfo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLocationEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /location/deletelocation:
+    post:
+      tags:
+        - Location Management
+      summary: Delete location
+      description: Deletes a location and returns a list of affected devices
+      operationId: deleteLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteLocationEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteLocationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+components:
+  schemas:
+    BaseEntry:
+      type: object
+      properties:
+        app:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Application type identifier
+              example: "android"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+          required:
+            - type
+            - version
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID
+          example: "default"
+      required:
+        - app
+        
+    BaseResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response code
+          example: "0"
+        msg:
+          type: string
+          description: Response message
+          example: "Success"
+      required:
+        - code
+        
+    LocationInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Location ID
+          example: 12345
+        adminId:
+          type: integer
+          description: User ID of the admin
+          example: 1001
+        locationName:
+          type: string
+          description: Name of the location
+          example: "Home"
+        country:
+          type: string
+          description: Country
+          example: "United States"
+        state:
+          type: string
+          description: State/province
+          example: "California"
+        city:
+          type: string
+          description: City
+          example: "San Francisco"
+        district:
+          type: string
+          description: District
+          example: "Mission District"
+        streetAddress1:
+          type: string
+          description: Street address line 1
+          example: "123 Main St"
+        streetAddress2:
+          type: string
+          description: Street address line 2
+          example: "Apt 4B"
+        postalCode:
+          type: string
+          description: Postal/ZIP code
+          example: "94105"
+        insertTime:
+          type: integer
+          format: int64
+          description: Creation timestamp (Unix time)
+          example: 1609459200
+      required:
+        - id
+        - locationName
+        
+    AllLocationResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: List of locations
+              items:
+                $ref: '#/components/schemas/LocationInfo'
+                
+    LocationEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            locationName:
+              type: string
+              description: Name of the location
+              example: "Home"
+            country:
+              type: string
+              description: Country where the location is situated
+              example: "United States"
+            state:
+              type: string
+              description: State/province
+              example: "California"
+            city:
+              type: string
+              description: City
+              example: "San Francisco"
+            district:
+              type: string
+              description: District/neighborhood
+              example: "Mission District"
+            streetAddress1:
+              type: string
+              description: Primary street address
+              example: "123 Main St"
+            streetAddress2:
+              type: string
+              description: Secondary address information (apt, suite, etc.)
+              example: "Apt 4B"
+            postalCode:
+              type: string
+              description: Postal/ZIP code
+              example: "94105"
+            adminId:
+              type: integer
+              description: Admin ID (if applicable)
+              example: 1001
+            id:
+              type: integer
+              description: ID value (usually 0 for new locations)
+              default: 0
+              example: 0
+            insertTime:
+              type: integer
+              format: int64
+              description: Time of insertion (usually 0, server will assign)
+              default: 0
+              example: 0
+          required:
+            - locationName
+            
+    LocationInsertResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/LocationInfo'
+              
+    UpdateLocationEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/LocationEntry'
+        - type: object
+          required:
+            - id
+            - locationName
+            
+    DeleteLocationEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: ID of the location to delete
+              example: 12345
+          required:
+            - id
+            
+    DeviceBasicInfo:
+      type: object
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number
+          example: "AB1234567"
+        deviceName:
+          type: string
+          description: Name of the device
+          example: "Front Door Camera"
+        online:
+          type: integer
+          description: Device online status (1 = online, 0 = offline)
+          enum: [0, 1]
+          example: 1
+        deviceModel:
+          type: string
+          description: Model information
+          example: "VicoHome Pro"
+        batteryLevel:
+          type: integer
+          description: Battery level percentage
+          minimum: 0
+          maximum: 100
+          example: 85
+      required:
+        - serialNumber
+        - deviceName
+            
+    DeleteLocationResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                list:
+                  type: array
+                  description: Array of devices that were affected by the location deletion
+                  items:
+                    $ref: '#/components/schemas/DeviceBasicInfo'

@@ -1,0 +1,228 @@
+openapi: 3.0.0
+info:
+  title: VicoHome Notification API
+  description: API for VicoHome notification and alert settings
+  version: 1.0.0
+
+servers:
+  - url: https://api-us.vicohome.io
+    description: Production API server
+
+paths:
+  /usersetting/queryswitch:
+    post:
+      tags:
+        - Notification Settings
+      summary: Query merged push notification settings
+      description: Retrieves the user's notification merge settings
+      operationId: queryMergedNotificationSwitch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergePushResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /usersetting/switch:
+    post:
+      tags:
+        - Notification Settings
+      summary: Update merged push notification settings
+      description: Updates the user's notification merge settings
+      operationId: updateMergedNotificationSwitch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergePushEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/mechanical/dingdong/audition:
+    post:
+      tags:
+        - Notification Settings
+        - Doorbell Features
+      summary: Test audition/doorbell sound
+      description: Triggers a test sound for the mechanical chime feature on compatible doorbell devices
+      operationId: testDoorbellSound
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommonSNRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+components:
+  schemas:
+    BaseEntry:
+      type: object
+      properties:
+        app:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Application type identifier
+              example: "android"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+          required:
+            - type
+            - version
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID
+          example: "default"
+      required:
+        - app
+        
+    BaseResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Response code
+          example: "0"
+        msg:
+          type: string
+          description: Response message
+          example: "Success"
+      required:
+        - code
+        
+    MergePushResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                messageMergeSwitch:
+                  type: string
+                  description: Notification merge setting ("1" for enabled, "0" for disabled)
+                  enum: ["0", "1"]
+                  example: "1"
+                userId:
+                  type: string
+                  description: The user's ID
+                  example: "12345"
+                  
+    MergePushEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            messageMergeSwitch:
+              type: integer
+              description: Value to control message merging (1 to enable, 0 to disable)
+              enum: [0, 1]
+              example: 1
+          required:
+            - messageMergeSwitch
+            
+    CommonSNRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+          required:
+            - serialNumber

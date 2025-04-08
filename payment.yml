@@ -1,0 +1,181 @@
+openapi: 3.0.0
+info:
+  title: VicoHome Payment API
+  description: API for VicoHome payment and subscription verification
+  version: 1.0.0
+
+servers:
+  - url: https://api-us.vicohome.io
+    description: Production API server
+
+paths:
+  /pay/google/order/verify:
+    post:
+      tags:
+        - Payment
+      summary: Verify Google Pay order information
+      description: Verifies Google Play subscription purchases and activates service
+      operationId: uploadGooglePayInfo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayResultResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayResultResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayResultResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayResultResponse'
+
+components:
+  schemas:
+    BaseEntry:
+      type: object
+      properties:
+        app:
+          type: object
+          properties:
+            apiVersion:
+              type: string
+              description: API version
+              example: "1.0"
+            appName:
+              type: string
+              description: Application name
+              example: "VicoHome"
+            appType:
+              type: string
+              description: Application type identifier
+              example: "android"
+            bundle:
+              type: string
+              description: Bundle identifier
+              example: "com.vicohome.app"
+            countlyId:
+              type: string
+              description: Analytics ID
+              example: "abc123"
+            env:
+              type: string
+              description: Environment
+              example: "prod"
+            tenantId:
+              type: string
+              description: Tenant identifier
+              example: "default"
+            timeZone:
+              type: string
+              description: User's timezone
+              example: "America/Los_Angeles"
+            version:
+              type: string
+              description: Application version
+              example: "1.2.3"
+            versionName:
+              type: string
+              description: Application version name
+              example: "1.2.3"
+          required:
+            - appType
+            - version
+        countryNo:
+          type: string
+          description: User's country code
+          example: "US"
+        language:
+          type: string
+          description: User's language preference
+          example: "en"
+        tenantId:
+          type: string
+          description: User's tenant ID
+          example: "default"
+      required:
+        - app
+        
+    OrderEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            productId:
+              type: integer
+              description: Subscription product ID being purchased
+              example: 12345
+            purchaseToken:
+              type: string
+              description: Token from Google Play for verification
+              example: "abcdefghijklmnopqrstuvwxyz"
+            subscriptionGroupId:
+              type: string
+              description: ID of the subscription group
+              example: "premium_group_1"
+            outTradeNo:
+              type: string
+              description: Google's order ID for the transaction
+              example: "GPA.1234-5678-9012-34567"
+            guidanceSource:
+              type: integer
+              description: Source of purchase flow (e.g., 1=device detail, 2=account)
+              example: 1
+              enum: [1, 2]
+            tradeType:
+              type: integer
+              description: Type of transaction (1=one-time, 2=subscription)
+              example: 2
+              enum: [1, 2]
+            tierDeviceList:
+              type: array
+              description: List of device serial numbers selected for subscription
+              items:
+                type: string
+              example: ["SN12345678", "SN87654321"]
+          required:
+            - productId
+            - purchaseToken
+            - subscriptionGroupId
+            - outTradeNo
+            - guidanceSource
+            - tradeType
+            - tierDeviceList
+            
+    PayResultResponse:
+      type: object
+      description: Payment verification result
+      properties:
+        result:
+          type: integer
+          description: Result code (0 indicates success)
+          example: 0
+        msg:
+          type: string
+          description: Response message
+          example: "Success"
+        data:
+          type: string
+          description: Additional response data (usually empty or confirmation token)
+          example: ""
+      required:
+        - result

@@ -687,6 +687,236 @@ paths:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
 
+  /device/dormancy/list:
+    post:
+      tags:
+        - Device Management
+        - Sleep Mode
+      summary: List sleep plans
+      description: Retrieves the list of sleep/dormancy plans for a device
+      operationId: listDormancyPlans
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommonSNRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SleepPlanResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/dormancy/create:
+    post:
+      tags:
+        - Device Management
+        - Sleep Mode
+      summary: Create sleep plan
+      description: Creates a new sleep/dormancy plan for a device
+      operationId: createDormancyPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceSleepPlanBean'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/dormancy/edit:
+    post:
+      tags:
+        - Device Management
+        - Sleep Mode
+      summary: Edit sleep plan
+      description: Edits an existing sleep/dormancy plan for a device
+      operationId: editDormancyPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceSleepPlanBean'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/dormancy/delete:
+    post:
+      tags:
+        - Device Management
+        - Sleep Mode
+      summary: Delete sleep plan
+      description: Deletes an existing sleep/dormancy plan for a device
+      operationId: deleteDormancyPlan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeletePlanCreateData'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device or plan not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/dormancy/switch:
+    post:
+      tags:
+        - Device Management
+        - Sleep Mode
+      summary: Toggle sleep plan on/off
+      description: Toggles the sleep/dormancy mode on or off for a specific device
+      operationId: toggleDormancySwitch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SleepPlanData'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
 components:
   schemas:
     BaseEntry:
@@ -1059,6 +1289,182 @@ components:
           required:
             - id
             - serialNumber
+            
+    CommonSNRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+          required:
+            - serialNumber
+            
+    SleepPlan:
+      type: object
+      properties:
+        serialNumber:
+          type: string
+          description: Device serial number
+          example: "AB1234567"
+        startHour:
+          type: integer
+          description: Hour when sleep mode starts (0-23)
+          minimum: 0
+          maximum: 23
+          example: 22
+        startMinute:
+          type: integer
+          description: Minute when sleep mode starts (0-59)
+          minimum: 0
+          maximum: 59
+          example: 30
+        endHour:
+          type: integer
+          description: Hour when sleep mode ends (0-23)
+          minimum: 0
+          maximum: 23
+          example: 7
+        endMinute:
+          type: integer
+          description: Minute when sleep mode ends (0-59)
+          minimum: 0
+          maximum: 59
+          example: 0
+        period:
+          type: integer
+          description: Period value (e.g., 1 for daily)
+          example: 1
+        planDay:
+          type: integer
+          description: Bitmask of days for the plan (127 = all days)
+          example: 127
+        planStartDay:
+          type: array
+          description: List of start days for the plan (1=Monday, 7=Sunday)
+          items:
+            type: integer
+            minimum: 1
+            maximum: 7
+          example: [1, 2, 3, 4, 5, 6, 7]
+      required:
+        - serialNumber
+        - startHour
+        - startMinute
+        - endHour
+        - endMinute
+        - period
+        - planDay
+            
+    SleepPlanResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              description: List of sleep plans for the device
+              items:
+                $ref: '#/components/schemas/SleepPlan'
+                
+    DeviceSleepPlanBean:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            startHour:
+              type: integer
+              description: Start hour of sleep period (0-23)
+              minimum: 0
+              maximum: 23
+              example: 22
+            startMinute:
+              type: integer
+              description: Start minute of sleep period (0-59)
+              minimum: 0
+              maximum: 59
+              example: 30
+            endHour:
+              type: integer
+              description: End hour of sleep period (0-23)
+              minimum: 0
+              maximum: 23
+              example: 7
+            endMinute:
+              type: integer
+              description: End minute of sleep period (0-59)
+              minimum: 0
+              maximum: 59
+              example: 0
+            period:
+              type: integer
+              description: Identifier for this sleep plan
+              example: 1
+            planDay:
+              type: integer
+              description: Bitmask of days for the plan (127 = all days)
+              example: 127
+            planStartDay:
+              type: array
+              description: List of start days for the plan (1=Monday, 7=Sunday)
+              items:
+                type: integer
+                minimum: 1
+                maximum: 7
+              example: [1, 2, 3, 4, 5, 6, 7]
+          required:
+            - serialNumber
+            - startHour
+            - startMinute
+            - endHour
+            - endMinute
+            - period
+            
+    DeletePlanCreateData:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            period:
+              type: integer
+              description: The period identifier for the sleep plan to delete
+              example: 1
+          required:
+            - serialNumber
+            - period
+            
+    SleepPlanData:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            dormancySwitch:
+              type: integer
+              description: Sleep mode status (1 = on, 0 = off)
+              enum: [0, 1]
+              example: 1
+          required:
+            - serialNumber
+            - dormancySwitch
             
     GetOtaStatusResponse:
       type: object
