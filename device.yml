@@ -276,6 +276,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
+                
+  /device/otastatus/:
+    post:
+      tags:
+        - Device Management
+        - Firmware Updates
+      summary: Get OTA update status
+      description: Retrieves the current status of an Over-The-Air (OTA) firmware update for a specific device
+      operationId: getOtaStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SerialNoEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOtaStatusResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
 
 components:
   schemas:
@@ -360,6 +406,57 @@ components:
           required:
             - serialNumber
             - modifiableAttributes
+            
+    GetOtaStatusResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                serialNumber:
+                  type: string
+                  description: Device serial number
+                  example: "AB1234567"
+                inProgress:
+                  type: integer
+                  description: Flag indicating if update is in progress (0 or 1)
+                  enum: [0, 1]
+                  example: 1
+                status:
+                  type: integer
+                  description: General status code
+                  example: 0
+                otaStatus:
+                  type: integer
+                  description: OTA specific status code (0=not started, 1=downloading, 2=installing, 3=completed, 4=failed, 5=timeout)
+                  enum: [0, 1, 2, 3, 4, 5]
+                  example: 1
+                transferredSize:
+                  type: integer
+                  format: int64
+                  description: Bytes transferred so far
+                  example: 5242880
+                totalSize:
+                  type: integer
+                  format: int64
+                  description: Total bytes to transfer
+                  example: 10485760
+                targetFirmware:
+                  type: string
+                  description: Target firmware version
+                  example: "v1.2.3"
+                localDataProgress:
+                  type: integer
+                  description: Local data transfer progress
+                  example: 50
+                localDataStartTime:
+                  type: integer
+                  format: int64
+                  description: Timestamp when local data transfer started (Unix time)
+                  example: 1612345678
 
     BaseResponse:
       type: object

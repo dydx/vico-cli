@@ -41,7 +41,7 @@ groups:
       - path: /device/otastatus/
         method: POST
         description: Get OTA update status
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/otastart/
         method: POST
