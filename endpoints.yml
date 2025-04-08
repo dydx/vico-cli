@@ -1,0 +1,245 @@
+---
+# VicoHome API Endpoints
+baseUrl: https://api-us.vicohome.io
+
+# Groups of API endpoints
+groups:
+  - name: device
+    description: Device management endpoints
+    state: verified
+    endpoints:
+      - path: /device/listuserdevices
+        method: POST
+        description: List all devices for a user
+        state: openapi
+        file: device.yml
+      - path: /device/selectsingledevice
+        method: POST
+        description: Get single device details
+        state: openapi
+        file: device.yml
+      - path: /device/deactivatedevice
+        method: POST
+        description: Unbind a device
+        state: openapi
+        file: device.yml
+      - path: /device/devicePushImage
+        method: POST
+        description: Device thumbnail images
+        state: openapi
+        file: device.yml
+      - path: /device/getDeviceAttributes
+        method: POST
+        description: Get device attributes
+        state: openapi
+        file: device.yml
+      - path: /device/modifyDeviceAttributes
+        method: POST
+        description: Modify device attributes
+        state: openapi
+        file: device.yml
+      - path: /device/otastatus/
+        method: POST
+        description: Get OTA update status
+        state: verified
+        file: device.yml
+      - path: /device/otastart/
+        method: POST
+        description: Start OTA update
+        state: verified
+        file: device.yml
+      - path: /device/rotate-calibration
+        method: POST
+        description: Calibrate device rotation
+        state: verified
+        file: device.yml
+      - path: /device/updateFloodlightSwitch
+        method: POST
+        description: Update floodlight switch
+        state: verified
+        file: device.yml
+      - path: /device/updateFloodlightLuminance
+        method: POST
+        description: Update floodlight luminance
+        state: verified
+        file: device.yml
+
+  - name: activity_zones
+    description: Activity zone management endpoints
+    state: verified
+    endpoints:
+      - path: /device/insertactivityzone
+        method: POST
+        description: Add activity zone
+        state: verified
+        file: device.yml
+      - path: /device/getactivityzone
+        method: POST
+        description: Get activity zones
+        state: verified
+        file: device.yml
+      - path: /device/updateactivityzone
+        method: POST
+        description: Update activity zone
+        state: verified
+        file: device.yml
+      - path: /device/deleteactivityzone
+        method: POST
+        description: Delete activity zone
+        state: verified
+        file: device.yml
+
+  - name: ai_features
+    description: AI detection and event settings
+    state: verified
+    endpoints:
+      - path: /aiAssist/queryEventObjectSwitch
+        method: POST
+        description: Query AI event detection settings
+        state: verified
+        file: ai.yml
+      - path: /aiAssist/updateEventObjectSwitch
+        method: POST
+        description: Update AI event detection settings
+        state: verified
+        file: ai.yml
+      - path: /birdLovers/queryBirdAiSetting
+        method: POST
+        description: Query bird AI settings
+        state: verified
+        file: ai.yml
+      - path: /birdLovers/updateBirdAiSetting
+        method: POST
+        description: Update bird AI settings
+        state: verified
+        file: ai.yml
+      - path: /device/queryMessageNotification/v1
+        method: POST
+        description: Query person detection details
+        state: verified
+        file: ai.yml
+      - path: /device/updateMessageNotification/v1
+        method: POST
+        description: Update person detection settings
+        state: verified
+        file: ai.yml
+
+  - name: location
+    description: Location management endpoints
+    state: verified
+    endpoints:
+      - path: /location/listlocation
+        method: POST
+        description: List locations
+        state: verified
+        file: location.yml
+      - path: /location/insertlocation/
+        method: POST
+        description: Add location
+        state: verified
+        file: location.yml
+      - path: /location/updatelocationinfo
+        method: POST
+        description: Update location
+        state: verified
+        file: location.yml
+      - path: /location/deletelocation
+        method: POST
+        description: Delete location
+        state: verified
+        file: location.yml
+
+  - name: dormancy
+    description: Sleep/Dormancy schedule management
+    state: verified
+    endpoints:
+      - path: /device/dormancy/list
+        method: POST
+        description: List sleep plans
+        state: verified
+        file: device.yml
+      - path: /device/dormancy/create
+        method: POST
+        description: Create sleep plan
+        state: verified
+        file: device.yml
+      - path: /device/dormancy/edit
+        method: POST
+        description: Edit sleep plan
+        state: verified
+        file: device.yml
+      - path: /device/dormancy/delete
+        method: POST
+        description: Delete sleep plan
+        state: verified
+        file: device.yml
+      - path: /device/dormancy/switch
+        method: POST
+        description: Toggle sleep plan on/off
+        state: verified
+        file: device.yml
+
+  - name: notification
+    description: Notification and alert settings
+    state: verified
+    endpoints:
+      - path: /usersetting/queryswitch
+        method: POST
+        description: Query merged push notification settings
+        state: verified
+        file: notification.yml
+      - path: /usersetting/switch
+        method: POST
+        description: Update merged push notification settings
+        state: verified
+        file: notification.yml
+      - path: /device/mechanical/dingdong/audition
+        method: POST
+        description: Test audition/doorbell sound
+        state: verified
+        file: notification.yml
+
+  - name: vip
+    description: VIP/Subscription management
+    state: verified
+    endpoints:
+      - path: /vip/device/cloud/info
+        method: POST
+        description: Query device cloud service VIP info
+        state: verified
+        file: vip.yml
+      - path: /vip/tier/list/v4
+        method: GET
+        description: Get subscription tier list
+        state: verified
+        file: vip.yml
+      - path: /vip/user/service/info
+        method: POST
+        description: Get VIP user service info
+        state: verified
+        file: vip.yml
+      - path: /vip/user/device/list
+        method: POST
+        description: List devices with VIP status
+        state: verified
+        file: vip.yml
+      - path: /vip/user/rolling/day
+        method: POST
+        description: Update user rolling day
+        state: verified
+        file: vip.yml
+      - path: /vip/available/purchase/device
+        method: POST
+        description: Get purchasable devices
+        state: verified
+        file: vip.yml
+      - path: /pay/google/order/verify
+        method: POST
+        description: Verify Google Pay order information
+        state: verified
+        file: payment.yml
+      - path: /user/queryFreeTier
+        method: POST
+        description: Query free tier status
+        state: verified
+        file: vip.yml
