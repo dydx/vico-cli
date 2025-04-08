@@ -3,10 +3,6 @@ info:
   title: VicoHome Device API
   description: API for VicoHome device management
   version: 1.0.0
-  contact:
-    name: VicoHome Support
-    url: https://vicohome.io/support
-    email: support@vicohome.io
 
 servers:
   - url: https://api-us.vicohome.io
@@ -322,6 +318,374 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BaseResponse'
+                
+  /device/otastart/:
+    post:
+      tags:
+        - Device Management
+        - Firmware Updates
+      summary: Start OTA update
+      description: Initiates the Over-The-Air (OTA) firmware update process for a specified device
+      operationId: startOtaUpdate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SerialNoEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOtaStatusResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/rotate-calibration:
+    post:
+      tags:
+        - Device Management
+        - Device Configuration
+      summary: Calibrate device rotation
+      description: Initiates or checks the status of device rotation calibration for PTZ (Pan-Tilt-Zoom) cameras
+      operationId: rotateCalibration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RotateCalibrationRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RotateCalibrationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/updateFloodlightSwitch:
+    post:
+      tags:
+        - Device Management
+        - Device Configuration
+      summary: Update floodlight switch
+      description: Updates the floodlight switch status (on/off) for a device with floodlight capability
+      operationId: updateFloodlightSwitch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFloodlightSwitch'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/updateFloodlightLuminance:
+    post:
+      tags:
+        - Device Management
+        - Device Configuration
+      summary: Update floodlight luminance
+      description: Updates the brightness level of a device's floodlight
+      operationId: updateFloodlightLuminance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFloodlightLuminanceRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/insertactivityzone:
+    post:
+      tags:
+        - Device Management
+        - Activity Zones
+      summary: Add activity zone
+      description: Adds a new activity zone for a device camera
+      operationId: addActivityZone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneAddEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneAddResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/getactivityzone:
+    post:
+      tags:
+        - Device Management
+        - Activity Zones
+      summary: Get activity zones
+      description: Retrieves all activity zones defined for a specific device
+      operationId: getActivityZones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneGetEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ZoneGetResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/updateactivityzone:
+    post:
+      tags:
+        - Device Management
+        - Activity Zones
+      summary: Update activity zone
+      description: Updates an existing activity zone for a camera device
+      operationId: updateActivityZone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneUpdateEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device or zone not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+                
+  /device/deleteactivityzone:
+    post:
+      tags:
+        - Device Management
+        - Activity Zones
+      summary: Delete activity zone
+      description: Deletes an existing activity zone for a camera device
+      operationId: deleteActivityZone
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ZoneDeleteEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '404':
+          description: Device or zone not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
 
 components:
   schemas:
@@ -406,6 +770,295 @@ components:
           required:
             - serialNumber
             - modifiableAttributes
+            
+    RotateCalibrationRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            needCalibration:
+              type: boolean
+              description: true to start calibration, false to check status
+              example: true
+          required:
+            - serialNumber
+            - needCalibration
+            
+    RotateCalibrationResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                calibrationFinished:
+                  type: boolean
+                  description: Whether calibration has completed
+                  example: false
+                  
+    UpdateFloodlightSwitch:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            switchOn:
+              type: boolean
+              description: True to turn on, false to turn off
+              example: true
+          required:
+            - serialNumber
+            - switchOn
+            
+    UpdateFloodlightLuminanceRequest:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            luminance:
+              type: integer
+              description: Brightness level
+              minimum: 1
+              maximum: 100
+              example: 75
+          required:
+            - serialNumber
+            - luminance
+            
+    ZoneAddEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            zoneName:
+              type: string
+              description: Name of the activity zone
+              example: "Front Yard"
+            vertices:
+              type: string
+              description: Coordinates that define the zone boundary as a polygon (comma-separated x,y pairs)
+              example: "10,20,150,20,150,100,10,100"
+            needAlarm:
+              type: integer
+              description: Flag to enable/disable alarm (0=disabled, 1=enabled)
+              enum: [0, 1]
+              example: 1
+            needPush:
+              type: integer
+              description: Flag to enable/disable push notifications
+              enum: [0, 1]
+              example: 1
+            needRecord:
+              type: integer
+              description: Flag to enable/disable recording for events
+              enum: [0, 1]
+              example: 1
+            requestId:
+              type: string
+              description: Request identifier for tracking
+              example: "request-123456"
+          required:
+            - serialNumber
+            - zoneName
+            - vertices
+            - needAlarm
+            - needPush
+            - needRecord
+            
+    ZoneAddResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: ID of the newly created activity zone
+                  example: 12345
+                  
+    ZoneGetEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            language:
+              type: string
+              description: User language preference
+              example: "en"
+            requestId:
+              type: string
+              description: Request identifier for tracking
+              example: "request-123456"
+          required:
+            - serialNumber
+            
+    ZoneGetResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                list:
+                  type: array
+                  description: Array of activity zones
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: Zone ID
+                        example: 12345
+                      serialNumber:
+                        type: string
+                        description: Device serial number
+                        example: "AB1234567"
+                      zoneName:
+                        type: string
+                        description: Custom name of the zone
+                        example: "Front Yard"
+                      zoneNameId:
+                        type: integer
+                        description: Zone name identifier
+                        example: 0
+                      vertices:
+                        type: string
+                        description: Coordinates defining the zone boundaries
+                        example: "10,20,150,20,150,100,10,100"
+                      needPush:
+                        type: integer
+                        description: Push notification setting (0=disabled, 1=enabled)
+                        enum: [0, 1]
+                        example: 1
+                      needAlarm:
+                        type: integer
+                        description: Alarm setting (0=disabled, 1=enabled)
+                        enum: [0, 1]
+                        example: 1
+                      needRecord:
+                        type: integer
+                        description: Recording setting (0=disabled, 1=enabled)
+                        enum: [0, 1]
+                        example: 1
+                      modelCategory:
+                        type: integer
+                        description: Device model category
+                        example: 1
+                      deviceName:
+                        type: string
+                        description: Name of the device
+                        example: "Front Door Camera"
+                        
+    ZoneUpdateEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: Zone ID to update
+              example: 12345
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            zoneName:
+              type: string
+              description: Name of the activity zone
+              example: "Front Yard"
+            vertices:
+              type: string
+              description: Coordinates that define the zone boundary as a polygon
+              example: "10,20,150,20,150,100,10,100"
+            needAlarm:
+              type: integer
+              description: Flag to enable/disable alarm (0=disabled, 1=enabled)
+              enum: [0, 1]
+              example: 1
+            needPush:
+              type: integer
+              description: Flag to enable/disable push notifications
+              enum: [0, 1]
+              example: 1
+            needRecord:
+              type: integer
+              description: Flag to enable/disable recording for events
+              enum: [0, 1]
+              example: 1
+            language:
+              type: string
+              description: User's language preference
+              example: "en"
+            requestId:
+              type: string
+              description: Request identifier for tracking
+              example: "request-123456"
+          required:
+            - id
+            - serialNumber
+            - zoneName
+            - vertices
+            - needAlarm
+            - needPush
+            - needRecord
+            
+    ZoneDeleteEntry:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BaseEntry'
+        - type: object
+          properties:
+            id:
+              type: integer
+              description: Zone ID to delete
+              example: 12345
+            serialNumber:
+              type: string
+              description: Device serial number
+              example: "AB1234567"
+            language:
+              type: string
+              description: User's language preference
+              example: "en"
+            requestId:
+              type: string
+              description: Request identifier for tracking
+              example: "request-123456"
+          required:
+            - id
+            - serialNumber
             
     GetOtaStatusResponse:
       type: object

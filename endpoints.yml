@@ -6,7 +6,7 @@ baseUrl: https://api-us.vicohome.io
 groups:
   - name: device
     description: Device management endpoints
-    state: verified
+    state: openapi
     endpoints:
       - path: /device/listuserdevices
         method: POST
@@ -46,47 +46,47 @@ groups:
       - path: /device/otastart/
         method: POST
         description: Start OTA update
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/rotate-calibration
         method: POST
         description: Calibrate device rotation
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/updateFloodlightSwitch
         method: POST
         description: Update floodlight switch
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/updateFloodlightLuminance
         method: POST
         description: Update floodlight luminance
-        state: verified
+        state: openapi
         file: device.yml
 
   - name: activity_zones
     description: Activity zone management endpoints
-    state: verified
+    state: openapi
     endpoints:
       - path: /device/insertactivityzone
         method: POST
         description: Add activity zone
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/getactivityzone
         method: POST
         description: Get activity zones
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/updateactivityzone
         method: POST
         description: Update activity zone
-        state: verified
+        state: openapi
         file: device.yml
       - path: /device/deleteactivityzone
         method: POST
         description: Delete activity zone
-        state: verified
+        state: openapi
         file: device.yml
 
   - name: ai_features

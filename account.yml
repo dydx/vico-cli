@@ -1,0 +1,261 @@
+openapi: 3.0.0
+info:
+  title: VicoHome Device API
+  description: API for VicoHome device management
+  version: 1.0.0
+
+servers:
+  - url: https://api-us.vicohome.io
+    description: Production API server
+
+paths:
+  /account/login:
+    post:
+      tags:
+        - Account Management
+      summary: Authenticate user
+      description: |
+        Authenticates users and provides access tokens for the API. 
+        Users can log in using either email/password or phone/password combinations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/logout/:
+    post:
+      tags:
+        - Account Management
+      summary: Terminate user session
+      description: |
+        Terminates a user's session and invalidates their authentication token. 
+        It provides a secure way for users to sign out of the application.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseEntry'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /account/getipinfo:
+    get:
+      tags:
+        - Account Management
+      summary: Get IP address information
+      description: |
+        Retrieves information about the user's IP address and geographic location. 
+        This information is used for region-specific settings, support routing, 
+        and determining the appropriate API servers for the user's geographical location.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeInfoResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    AccountEntry:
+      type: object
+      description: Login request parameters
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address for email-based authentication
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          description: User's password for email-based authentication
+          example: "password123"
+        phone:
+          type: string
+          description: User's phone number for phone-based authentication
+          example: "+1234567890"
+        code:
+          type: string
+          description: Verification code for phone-based authentication
+          example: "123456"
+        loginType:
+          type: integer
+          description: |
+            Type of login:
+            - 0: Email/password login
+            - 1: Phone/code login
+          enum: [0, 1]
+          default: 0
+          example: 0
+      oneOf:
+        - required: [email, password, loginType]
+        - required: [phone, code, loginType]
+    
+    LoginResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          description: Response code (0 means success)
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Authentication token for subsequent API calls
+            refreshtoken:
+              type: string
+              description: Token used to refresh the authentication token
+            userInfo:
+              type: object
+              properties:
+                userID:
+                  type: string
+                  description: Unique identifier for the user
+                nickname:
+                  type: string
+                  description: User's display name
+                avatar:
+                  type: string
+                  description: URL to the user's profile picture
+            timestamp:
+              type: integer
+              description: Server timestamp of when the token was issued
+        message:
+          type: string
+          example: "Success"
+          description: Response message
+      required:
+        - code
+        - data
+        - message
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+          description: Error code
+        message:
+          type: string
+          example: "Invalid request parameters"
+          description: Error message describing what went wrong
+      required:
+        - code
+        - message
+
+    BaseEntry:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Authentication token received from login
+      required:
+        - token
+
+    BaseResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          description: Response code (0 means success)
+        message:
+          type: string
+          example: "Success"
+          description: Response message
+      required:
+        - code
+        - message
+
+    NodeInfoResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+          description: Response code (0 means success)
+        data:
+          type: object
+          properties:
+            countryCode:
+              type: string
+              example: "US"
+              description: ISO country code of the detected IP location
+            ip:
+              type: string
+              description: User's IP address as seen by the server
+        message:
+          type: string
+          example: "Success"
+          description: Response message
+      required:
+        - code
+        - data
+        - message
