@@ -2,9 +2,9 @@
 target: openapi.yml
 children:
   - file: device.yml
-    state: [started]
+    state: [complete]
   - file: location.yml
-    state: []
+    state: [started]
   - file: notification.yml
     state: []
   - file: ai.yml
@@ -12,4 +12,6 @@ children:
   - file: vip.yml
     state: []
   - file: payment.yml
+    state: []
+  - file: account.yml
     state: []
