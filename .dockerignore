@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+dist/
+artifacts/
+vicohome
+vicohome-*
+
+# GitHub specific files
+.github/
+
+# IDE files
+.idea/
+.vscode/
+
+# Test files
+*_test.go
+testing/
+
+# Documentation
+README.md
+*.md
+
+# Editor files
+*~
+*.swp
+*.swo

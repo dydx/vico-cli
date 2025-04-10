@@ -1,22 +1,44 @@
-FROM debian:bookworm-slim
+# Multi-architecture Dockerfile for the Vicohome CLI
+# This Dockerfile builds the CLI for multiple architectures (amd64, arm64)
+# It uses a multi-stage build to keep the final image small
 
+FROM --platform=${BUILDPLATFORM} golang:1.23-alpine AS builder
+
+ARG BUILDPLATFORM
 ARG TARGETPLATFORM
+ARG TARGETOS
 ARG TARGETARCH
+ARG VERSION=dev
+
+WORKDIR /src
+
+# Copy go.mod and go.sum files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build for the target platform
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    go build -ldflags="-X 'github.com/dydx/vico-cli/cmd.Version=${VERSION}'" \
+    -o /out/vicohome main.go
+
+# Create the final lightweight image
+FROM --platform=${TARGETPLATFORM} alpine:3.18
 
 WORKDIR /app
 
-# Copy the appropriate binary based on the target architecture
-COPY dist/vicohome-linux-${TARGETARCH} /app/vicohome
+# Install CA certificates for HTTPS requests
+RUN apk --no-cache add ca-certificates
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+# Copy the binary from the builder stage
+COPY --from=builder /out/vicohome /app/vicohome
 
-# Make executable
-RUN chmod +x /app/vicohome
-
-# Create a non-root user to run the application
-RUN useradd -m appuser
+# Create a non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
+# Set the entrypoint
 ENTRYPOINT ["/app/vicohome"]
+CMD ["version"]

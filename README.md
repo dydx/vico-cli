@@ -16,9 +16,17 @@ Download the pre-built binary for your platform from the [Releases page](https:/
 
 ### Docker
 
+The CLI is available as a multi-architecture Docker image (supports amd64 and arm64):
+
 ```bash
-docker pull ghcr.io/dydx/vicohome:latest
+# Run the CLI with version command
 docker run --rm ghcr.io/dydx/vicohome:latest version
+
+# Run other commands
+docker run --rm -e VICOHOME_EMAIL="your.email@example.com" -e VICOHOME_PASSWORD="your-password" ghcr.io/dydx/vicohome:latest devices list
+
+# You can specify a version tag
+docker run --rm ghcr.io/dydx/vicohome:v1.0.0 events list --format json
 ```
 
 ### Build from Source

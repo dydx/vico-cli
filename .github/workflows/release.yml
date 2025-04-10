@@ -109,6 +109,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -122,18 +125,21 @@ jobs:
       - name: Get version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+        
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v4
         with:
-          path: ./artifacts
-
-      - name: Prepare artifacts directory
-        run: |
-          mkdir -p ./dist
-          cp ./artifacts/vicohome-linux-amd64/vicohome-linux-amd64 ./dist/vicohome-linux-amd64
-          cp ./artifacts/vicohome-linux-arm64/vicohome-linux-arm64 ./dist/vicohome-linux-arm64
-          chmod +x ./dist/*
+          images: ghcr.io/${{ github.repository_owner }}/vicohome
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+          labels: |
+            org.opencontainers.image.title=Vicohome CLI
+            org.opencontainers.image.description=A command-line interface for interacting with the Vicohome API
+            org.opencontainers.image.version=${{ env.VERSION }}
+            org.opencontainers.image.licenses=MIT
 
       - name: Build and push multi-platform Docker image
         uses: docker/build-push-action@v4
@@ -142,6 +148,34 @@ jobs:
           file: ./Dockerfile.multi
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/vicohome:latest
-            ghcr.io/${{ github.repository_owner }}/vicohome:${{ env.VERSION }}
+          build-args: |
+            VERSION=${{ env.VERSION }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          
+      - name: Test Docker image
+        run: |
+          # Pull and test the image once it's available
+          docker run --rm ghcr.io/${{ github.repository_owner }}/vicohome:latest version
+          
+      - name: Add Docker image info to release notes
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          append_body: true
+          body: |
+            
+            ## Docker Image
+            
+            Multi-architecture Docker image (amd64, arm64) is available:
+            
+            ```bash
+            docker pull ghcr.io/${{ github.repository_owner }}/vicohome:${{ env.VERSION }}
+            docker pull ghcr.io/${{ github.repository_owner }}/vicohome:latest
+            ```
+            
+            Run it:
+            
+            ```bash
+            docker run --rm ghcr.io/${{ github.repository_owner }}/vicohome:latest version
+            ```
