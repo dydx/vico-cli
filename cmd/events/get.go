@@ -10,12 +10,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// EventRequest represents the JSON request body sent to the Vicohome API
+// when fetching a specific event by its trace ID.
 type EventRequest struct {
-	TraceId   string `json:"traceId"`
-	Language  string `json:"language"`
-	CountryNo string `json:"countryNo"`
+	TraceId   string `json:"traceId"`   // Unique identifier for the event
+	Language  string `json:"language"`  // Language code (e.g., "en" for English)
+	CountryNo string `json:"countryNo"` // Country code (e.g., "US" for United States)
 }
 
+// getCmd represents the command to retrieve details for a specific event by its trace ID.
+// It supports output in both table and JSON formats.
 var getCmd = &cobra.Command{
 	Use:   "get [traceID]",
 	Short: "Get details for a specific event",
@@ -71,6 +75,10 @@ func init() {
 	getCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
 }
 
+// getEvent fetches detailed information for a specific event from the Vicohome API.
+// It takes an authentication token and the event's trace ID, and returns
+// an Event object and any error encountered.
+// This function handles the API request, response parsing, and error handling.
 func getEvent(token string, traceID string) (Event, error) {
 	req := EventRequest{
 		TraceId:   traceID,

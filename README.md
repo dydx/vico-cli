@@ -116,6 +116,31 @@ All commands support both table (default) and JSON output formats:
    - Create a new release with the binaries attached
    - Publish Docker images to GitHub Packages
 
+## Documentation
+
+You can view the API documentation in several ways:
+
+### Online Documentation
+
+The latest API documentation is automatically published to GitHub Pages:
+
+[View Vicohome CLI Documentation](https://dydx.github.io/vico-cli/)
+
+### Local Documentation
+
+To generate and view documentation locally:
+
+```bash
+# Install godoc if you haven't already
+go install golang.org/x/tools/cmd/godoc@latest
+
+# Run godoc server
+godoc -http=:6060
+
+# View documentation in your browser at:
+# http://localhost:6060/pkg/github.com/dydx/vico-cli/
+```
+
 ## License
 
 [MIT](LICENSE)

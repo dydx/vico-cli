@@ -10,12 +10,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// DeviceRequest represents the JSON request body sent to the Vicohome API
+// when fetching a specific device by serial number.
 type DeviceRequest struct {
-	SerialNumber string `json:"serialNumber"`
-	Language     string `json:"language"`
-	CountryNo    string `json:"countryNo"`
+	SerialNumber string `json:"serialNumber"` // Unique identifier for the device
+	Language     string `json:"language"`     // Language code (e.g., "en" for English)
+	CountryNo    string `json:"countryNo"`    // Country code (e.g., "US" for United States)
 }
 
+// getCmd represents the command to retrieve details for a specific device by its serial number.
+// It supports output in both table and JSON formats.
 var getCmd = &cobra.Command{
 	Use:   "get [serialNumber]",
 	Short: "Get details for a specific device",
@@ -69,6 +73,11 @@ func init() {
 	getCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
 }
 
+// getDevice fetches detailed information for a specific device from the Vicohome API.
+// It takes an authentication token and the device's serial number, and returns
+// a Device object and any error encountered.
+// This function handles the API request, response parsing, and error handling including
+// authentication refreshes when needed.
 func getDevice(token string, serialNumber string) (Device, error) {
 	req := DeviceRequest{
 		SerialNumber: serialNumber,
@@ -122,6 +131,9 @@ func getDevice(token string, serialNumber string) (Device, error) {
 	return transformToDevice(data), nil
 }
 
+// boolFromInt converts an integer value to a human-readable string representation
+// of a boolean value. Any value greater than 0 returns "Yes", otherwise "No".
+// This is used for display purposes when showing boolean properties from the API.
 func boolFromInt(val int) string {
 	if val > 0 {
 		return "Yes"

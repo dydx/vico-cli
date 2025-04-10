@@ -1,3 +1,7 @@
+// Package cache provides caching functionality for authentication tokens.
+//
+// This package implements file-based caching of authentication tokens in the user's
+// home directory, with support for token expiration and management operations.
 package cache
 
 import (
@@ -8,19 +12,28 @@ import (
 	"time"
 )
 
-// TokenCache represents the structure of our token cache file
+// TokenCache represents the structure of the token cache file.
+// It stores both the authentication token and its expiration time.
 type TokenCache struct {
-	Token     string    `json:"token"`
-	ExpiresAt time.Time `json:"expires_at"`
+	Token     string    `json:"token"`      // The authentication token
+	ExpiresAt time.Time `json:"expires_at"` // When the token expires
 }
 
-// TokenCacheManager handles reading and writing the authentication token to a cache file
+// TokenCacheManager handles reading and writing authentication tokens to a cache file.
+// It provides methods for saving, retrieving, and clearing tokens, with support for
+// automatic expiration checking.
 type TokenCacheManager struct {
-	CacheDir  string
-	CacheFile string
+	CacheDir  string // Directory where cache files are stored
+	CacheFile string // Full path to the token cache file
 }
 
-// NewTokenCacheManager creates a new cache manager
+// NewTokenCacheManager creates a new token cache manager.
+// It sets up the cache directory in the user's home directory if it doesn't already exist.
+// The cache location is ~/.vicohome/auth.json
+//
+// Returns:
+//   - *TokenCacheManager: The configured cache manager if successful
+//   - error: Any error encountered during setup
 func NewTokenCacheManager() (*TokenCacheManager, error) {
 	// Get user's home directory
 	homeDir, err := os.UserHomeDir()
@@ -40,7 +53,16 @@ func NewTokenCacheManager() (*TokenCacheManager, error) {
 	}, nil
 }
 
-// SaveToken saves a token to the cache file with an expiration time
+// SaveToken saves an authentication token to the cache file with an expiration time.
+// The token is stored along with its expiration time calculated from the current time
+// plus the specified duration in hours.
+//
+// Parameters:
+//   - token: The authentication token to save
+//   - durationHours: How long the token should be considered valid, in hours
+//
+// Returns:
+//   - error: Any error encountered during the save operation
 func (m *TokenCacheManager) SaveToken(token string, durationHours int) error {
 	// Default to 24 hours if not specified
 	if durationHours <= 0 {
@@ -67,7 +89,13 @@ func (m *TokenCacheManager) SaveToken(token string, durationHours int) error {
 	return nil
 }
 
-// GetToken retrieves a token from the cache file if it exists and is not expired
+// GetToken retrieves a token from the cache file if it exists and is not expired.
+// It checks both for the existence of the cache file and whether the token inside
+// has expired based on its expiration timestamp.
+//
+// Returns:
+//   - string: The cached token if valid
+//   - bool: True if a valid token was found, false otherwise
 func (m *TokenCacheManager) GetToken() (string, bool) {
 	// Check if cache file exists
 	_, err := os.Stat(m.CacheFile)
@@ -98,7 +126,11 @@ func (m *TokenCacheManager) GetToken() (string, bool) {
 	return tokenCache.Token, true
 }
 
-// ClearToken removes the token cache file
+// ClearToken removes the token cache file if it exists.
+// This is typically called when a token is known to be invalid or expired.
+//
+// Returns:
+//   - error: Any error encountered during the removal operation
 func (m *TokenCacheManager) ClearToken() error {
 	_, err := os.Stat(m.CacheFile)
 	if os.IsNotExist(err) {

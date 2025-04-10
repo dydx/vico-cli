@@ -1,3 +1,7 @@
+// Package devices implements commands for managing and querying Vicohome devices.
+//
+// This package provides commands for listing all devices associated with a user account
+// and retrieving detailed information about specific devices.
 package devices
 
 import (
@@ -16,7 +20,9 @@ func init() {
 	devicesCmd.AddCommand(getCmd)
 }
 
-// GetDevicesCmd returns the devices command
+// GetDevicesCmd returns the devices command that provides access to device-related subcommands.
+// This function is called by the root command to add device functionality to the CLI.
+// It returns the devices command with all subcommands (list, get) already attached.
 func GetDevicesCmd() *cobra.Command {
 	return devicesCmd
 }

@@ -10,11 +10,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// DeviceListRequest represents the JSON request body sent to the Vicohome API
+// when listing user devices. It specifies language and country preferences.
 type DeviceListRequest struct {
-	Language  string `json:"language"`
-	CountryNo string `json:"countryNo"`
+	Language  string `json:"language"`  // Language code (e.g., "en" for English)
+	CountryNo string `json:"countryNo"` // Country code (e.g., "US" for United States)
 }
 
+// Device represents a Vicohome device with its properties as returned by the API.
+// This structure contains essential information about a device that can be displayed
+// to the user or used for further API calls.
 type Device struct {
 	SerialNumber   string `json:"serialNumber"`
 	ModelNo        string `json:"modelNo"`
@@ -32,6 +37,8 @@ type Device struct {
 
 var outputFormat string
 
+// listCmd represents the command to list all devices associated with the user's account.
+// It supports output in both table and JSON formats.
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all user devices",
@@ -65,16 +72,16 @@ var listCmd = &cobra.Command{
 			fmt.Println(string(prettyJSON))
 		} else {
 			// Output table format
-			fmt.Printf("%-36s %-20s %-20s %-15s %-15s %-5s\n", 
+			fmt.Printf("%-36s %-20s %-20s %-15s %-15s %-5s\n",
 				"Serial Number", "Model", "Name", "Network", "IP", "Battery")
 			fmt.Println("----------------------------------------------------------------------------------------------------------------")
 			for _, device := range devices {
-				fmt.Printf("%-36s %-20s %-20s %-15s %-15s %d%%\n", 
-					device.SerialNumber, 
-					device.ModelNo, 
-					device.DeviceName, 
-					device.NetworkName, 
-					device.IP, 
+				fmt.Printf("%-36s %-20s %-20s %-15s %-15s %d%%\n",
+					device.SerialNumber,
+					device.ModelNo,
+					device.DeviceName,
+					device.NetworkName,
+					device.IP,
 					device.BatteryLevel)
 			}
 		}
@@ -85,6 +92,10 @@ func init() {
 	listCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
 }
 
+// listDevices fetches all devices associated with the user's account from the Vicohome API.
+// It takes an authentication token and returns a slice of Device objects and any error encountered.
+// This function handles the API request, response parsing, and error handling including
+// authentication refreshes when needed.
 func listDevices(token string) ([]Device, error) {
 	req := DeviceListRequest{
 		Language:  "en",
@@ -151,6 +162,10 @@ func listDevices(token string) ([]Device, error) {
 	return devices, nil
 }
 
+// transformToDevice converts a map of device data from the API response into a Device struct.
+// It safely extracts and type-converts the various device properties from the dynamic map
+// into the strongly-typed Device structure. Missing fields in the map will result in
+// zero values in the returned Device structure.
 func transformToDevice(deviceMap map[string]interface{}) Device {
 	device := Device{}
 

@@ -1,3 +1,8 @@
+// Package cmd implements the command structure for the Vicohome CLI application.
+//
+// This package uses the Cobra library to define commands, subcommands and flags
+// that make up the CLI's interface. It acts as the command router, directing user
+// input to the appropriate handlers.
 package cmd
 
 import (
@@ -9,7 +14,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Version is set during build via -ldflags
+// Version is set during build via -ldflags.
+// It represents the current version of the CLI application.
 var Version = "dev"
 
 var cfgFile string
@@ -20,6 +26,9 @@ var rootCmd = &cobra.Command{
 	Long:  `A CLI tool for interacting with the Vicohome API to fetch and manage events.`,
 }
 
+// Execute runs the root command and handles any resulting errors.
+// If the command execution fails, the program will exit with a non-zero status code.
+// This function is called by the main function and serves as the entry point for the CLI.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -27,7 +36,7 @@ func Execute() {
 	}
 }
 
-// versionCmd represents the version command
+// versionCmd represents the version command, which displays the current version of the CLI.
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Display the version of vicohome",

@@ -11,13 +11,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// EventsRequest represents the JSON request body sent to the Vicohome API
+// when fetching events within a specific time range.
 type EventsRequest struct {
-	StartTimestamp string `json:"startTimestamp"`
-	EndTimestamp   string `json:"endTimestamp"`
-	Language       string `json:"language"`
-	CountryNo      string `json:"countryNo"`
+	StartTimestamp string `json:"startTimestamp"` // Start time in Unix timestamp format
+	EndTimestamp   string `json:"endTimestamp"`   // End time in Unix timestamp format
+	Language       string `json:"language"`       // Language code (e.g., "en" for English)
+	CountryNo      string `json:"countryNo"`      // Country code (e.g., "US" for United States)
 }
 
+// Event represents a Vicohome event with its properties as returned by the API.
+// This structure contains information about bird sightings, including metadata
+// about the device that captured the event, the bird identified, and media URLs.
 type Event struct {
 	TraceId        string  `json:"traceId"`
 	Timestamp      string  `json:"timestamp"`
@@ -31,14 +36,17 @@ type Event struct {
 	KeyShotUrl     string  `json:"keyShotUrl"`
 	ImageUrl       string  `json:"imageUrl"`
 	VideoUrl       string  `json:"videoUrl"`
-	
+
 	// Internal field - not exported to JSON
-	keyshots       []map[string]interface{} `json:"-"`
+	keyshots []map[string]interface{} `json:"-"`
 }
 
 var hours int
 var outputFormat string
 
+// listCmd represents the command to list events from the Vicohome API.
+// It allows users to fetch events from a specified number of hours in the past,
+// and supports output in both table and JSON formats.
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List events from the last N hours",
@@ -85,12 +93,12 @@ var listCmd = &cobra.Command{
 			fmt.Println(string(prettyJSON))
 		} else {
 			// Output table format
-			fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n", 
+			fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
 				"Trace ID", "Timestamp", "Device Name", "Bird Name", "Bird Latin")
 			fmt.Println("--------------------------------------------------------------------------------------------------")
 			for _, event := range events {
-				fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n", 
-					event.TraceId, 
+				fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
+					event.TraceId,
 					event.Timestamp,
 					event.DeviceName,
 					event.BirdName,
@@ -105,6 +113,10 @@ func init() {
 	listCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
 }
 
+// fetchEvents retrieves events from the Vicohome API within the specified time range.
+// It takes an authentication token and an EventsRequest object containing the time range
+// parameters, and returns a slice of Event objects and any error encountered.
+// This function handles the API request, response parsing, and error handling.
 func fetchEvents(token string, request EventsRequest) ([]Event, error) {
 	reqBody, err := json.Marshal(request)
 	if err != nil {
@@ -162,6 +174,10 @@ func fetchEvents(token string, request EventsRequest) ([]Event, error) {
 	return events, nil
 }
 
+// transformRawEvent converts a map of event data from the API response into an Event struct.
+// It safely extracts and type-converts the various event properties from the dynamic map
+// into the strongly-typed Event structure. It handles special processing for bird information,
+// timestamps, and keyshots. Default values are provided for missing or unidentified fields.
 func transformRawEvent(eventMap map[string]interface{}) Event {
 	event := Event{}
 
@@ -169,7 +185,7 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 	if val, ok := eventMap["traceId"].(string); ok {
 		event.TraceId = val
 	}
-	
+
 	// Fix: Handle timestamp as a number
 	if val, ok := eventMap["timestamp"].(float64); ok {
 		// Convert Unix timestamp to human-readable format
@@ -178,7 +194,7 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 	} else if val, ok := eventMap["timestamp"].(string); ok {
 		event.Timestamp = val
 	}
-	
+
 	if val, ok := eventMap["deviceName"].(string); ok {
 		event.DeviceName = val
 	}
@@ -188,14 +204,14 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 	if val, ok := eventMap["adminName"].(string); ok {
 		event.AdminName = val
 	}
-	
+
 	// Fix: Handle period as a number
 	if val, ok := eventMap["period"].(float64); ok {
 		event.Period = fmt.Sprintf("%.2fs", val)
 	} else if val, ok := eventMap["period"].(string); ok {
 		event.Period = val
 	}
-	
+
 	if val, ok := eventMap["imageUrl"].(string); ok {
 		event.ImageUrl = val
 	}
@@ -205,7 +221,7 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 
 	// Set default bird name
 	event.BirdName = "Unidentified"
-	
+
 	// Process subcategoryInfoList for bird data
 	if subcategoryInfoList, ok := eventMap["subcategoryInfoList"].([]interface{}); ok && len(subcategoryInfoList) > 0 {
 		for _, info := range subcategoryInfoList {

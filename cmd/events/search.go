@@ -16,6 +16,9 @@ var (
 	searchHours int
 )
 
+// searchCmd represents the command to search for events that match specific criteria.
+// It allows filtering events by field values (such as device name or bird name)
+// within a specified time range, and supports output in both table and JSON formats.
 var searchCmd = &cobra.Command{
 	Use:   "search",
 	Short: "Search events by field value",
@@ -87,12 +90,12 @@ var searchCmd = &cobra.Command{
 			fmt.Println(string(prettyJSON))
 		} else {
 			// Output table format
-			fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n", 
+			fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
 				"Trace ID", "Timestamp", "Device Name", "Bird Name", "Bird Latin")
 			fmt.Println("--------------------------------------------------------------------------------------------------")
 			for _, event := range filteredEvents {
-				fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n", 
-					event.TraceId, 
+				fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
+					event.TraceId,
 					event.Timestamp,
 					event.DeviceName,
 					event.BirdName,
@@ -107,15 +110,26 @@ func init() {
 	searchCmd.Flags().StringVar(&searchTerm, "value", "", "Value to search for")
 	searchCmd.Flags().IntVar(&searchHours, "hours", 24, "Number of hours to search back for events")
 	searchCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
-	
+
 	// Mark the field flag as required
 	searchCmd.MarkFlagRequired("field")
 }
 
-// matchesSearch checks if an event matches the search criteria
+// matchesSearch checks if an event matches the search criteria provided by the user.
+// It compares the specified field in the event with the search term, using case-insensitive
+// matching. For some fields like deviceName and birdName, it uses substring matching,
+// while for serialNumber it requires an exact match.
+//
+// Parameters:
+//   - event: The Event to check
+//   - field: The field name to check against (serialNumber, deviceName, birdName)
+//   - term: The value to search for
+//
+// Returns:
+//   - true if the event matches the search criteria, false otherwise
 func matchesSearch(event Event, field, term string) bool {
 	term = strings.ToLower(term)
-	
+
 	switch strings.ToLower(field) {
 	case "serialnumber":
 		return strings.ToLower(event.SerialNumber) == term
