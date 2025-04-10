@@ -1,0 +1,231 @@
+name: Unified CI/CD Workflow
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+jobs:
+  # Always run linting and simple build
+  check-and-build:
+    name: Lint and Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Check formatting
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "The following files are not formatted properly:"
+            gofmt -l .
+            echo "Please run 'gofmt -w .' to fix these issues."
+            exit 1
+          fi
+
+      - name: Run golint
+        run: |
+          go install golang.org/x/lint/golint@latest
+          golint -set_exit_status ./...
+
+      - name: Build
+        run: go build -o vico-cli main.go
+
+      - name: Run tests
+        run: go test ./...
+
+  # Only run on push to main or release tags
+  main-branch-workflow:
+    name: Main Branch Tasks
+    needs: check-and-build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      pages: write
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      # Multi-arch Test Build
+      - name: Multi-arch Test Build
+        run: |
+          GOOS=linux GOARCH=amd64 go build -o vico-cli-linux-amd64 main.go
+          GOOS=linux GOARCH=arm64 go build -o vico-cli-linux-arm64 main.go
+          GOOS=darwin GOARCH=amd64 go build -o vico-cli-darwin-amd64 main.go
+          GOOS=darwin GOARCH=arm64 go build -o vico-cli-darwin-arm64 main.go
+          GOOS=windows GOARCH=amd64 go build -o vico-cli-windows-amd64.exe main.go
+          GOOS=windows GOARCH=arm64 go build -o vico-cli-windows-arm64.exe main.go
+      
+      # Set up Docker for multi-arch builds
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      # Determine version for Docker image
+      - name: Get version
+        id: get_version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "VERSION=latest-dev" >> $GITHUB_ENV
+          fi
+      
+      # Docker Image Build (for both main and tag pushes)
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/vico-cli
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ env.VERSION }}
+            ${{ startsWith(github.ref, 'refs/tags/v') && 'type=semver,pattern={{version}}' || '' }}
+            ${{ startsWith(github.ref, 'refs/tags/v') && 'type=semver,pattern={{major}}.{{minor}}' || '' }}
+          labels: |
+            org.opencontainers.image.title=vico-cli CLI
+            org.opencontainers.image.description=A command-line interface for interacting with the vico-cli API
+            org.opencontainers.image.version=${{ env.VERSION }}
+            org.opencontainers.image.licenses=MIT
+      
+      - name: Build and push multi-platform Docker image
+        uses: docker/build-push-action@v4
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+        with:
+          context: .
+          file: ./Dockerfile.multi
+          push: true
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            VERSION=${{ env.VERSION }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      
+      # Generate GoDoc
+      - name: Install godoc2markdown
+        run: go install github.com/davecheney/godoc2md@latest
+      
+      - name: Generate documentation
+        run: |
+          mkdir -p docs
+          
+          # Generate package documentation
+          go list -f '{{.ImportPath}}' ./... | while read pkg; do
+            echo "Generating docs for $pkg"
+            pkg_path=$(echo $pkg | sed 's|github.com/dydx/vico-cli/||')
+            mkdir -p docs/$(dirname $pkg_path)
+            godoc2md $pkg > docs/$pkg_path.md
+          done
+          
+          # Create index
+          cat > docs/index.md <<EOF
+          # Vicohome CLI Documentation
+          
+          This is the API documentation for the Vicohome CLI tool, generated from godoc comments.
+          
+          ## Packages
+          
+          $(go list -f '* [{{.ImportPath}}]({{.ImportPath}}.md)' ./... | sed 's|github.com/dydx/vico-cli/||g')
+          
+          ## Usage
+          
+          For usage instructions, please see the [README.md](https://github.com/dydx/vico-cli).
+          EOF
+      
+      # Publish Release Assets (only for tagged releases)
+      - name: Prepare release assets
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          mkdir -p release-assets
+          cp vico-cli-* release-assets/
+          
+          # Create Docker info file
+          cat > release-assets/docker-info.md << EOF
+          ## Docker Image
+          
+          Multi-architecture Docker image (amd64, arm64) is available:
+          
+          \`\`\`bash
+          docker pull ghcr.io/${{ github.repository_owner }}/vico-cli:${{ env.VERSION }}
+          docker pull ghcr.io/${{ github.repository_owner }}/vico-cli:latest
+          \`\`\`
+          
+          Run it:
+          
+          \`\`\`bash
+          docker run --rm ghcr.io/${{ github.repository_owner }}/vico-cli:latest version
+          \`\`\`
+          EOF
+          
+          # Prepare release body
+          echo "## vico-cli CLI ${{ env.VERSION }}" > release-body.md
+          echo "" >> release-body.md
+          echo "### Installation" >> release-body.md
+          echo "" >> release-body.md
+          echo "Download the binary for your platform and architecture." >> release-body.md
+          echo "" >> release-body.md
+          cat release-assets/docker-info.md >> release-body.md
+      
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: Release ${{ env.VERSION }}
+          body_path: release-body.md
+          draft: false
+          prerelease: false
+          files: |
+            release-assets/vico-cli-darwin-amd64
+            release-assets/vico-cli-darwin-arm64
+            release-assets/vico-cli-linux-amd64
+            release-assets/vico-cli-linux-arm64
+            release-assets/vico-cli-windows-amd64.exe
+            release-assets/vico-cli-windows-arm64.exe
+      
+      # Publish GoDoc to GitHub Pages (only for main branch)
+      - name: Setup Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v5
+      
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './docs'
+      
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        id: deployment
+        uses: actions/deploy-pages@v4
