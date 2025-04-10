@@ -61,10 +61,11 @@ var getCmd = &cobra.Command{
 			if event.BirdConfidence > 0 {
 				fmt.Printf("Confidence:     %.2f%%\n", event.BirdConfidence*100)
 			}
+			fmt.Printf("KeyShot URL:    %s\n", event.KeyShotUrl)
 			fmt.Printf("Image URL:      %s\n", event.ImageUrl)
 			fmt.Printf("Video URL:      %s\n", event.VideoUrl)
 			fmt.Println("\nKeyshots:")
-			for i, keyshot := range event.Keyshots {
+			for i, keyshot := range event.keyshots {
 				fmt.Printf("\nKeyshot %d:\n", i+1)
 				if url, ok := keyshot["imageUrl"].(string); ok {
 					fmt.Printf("  Image URL: %s\n", url)

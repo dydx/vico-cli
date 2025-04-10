@@ -20,18 +20,21 @@ type EventsRequest struct {
 }
 
 type Event struct {
-	TraceId      string                   `json:"traceId"`
-	Timestamp    string                   `json:"timestamp"`
-	DeviceName   string                   `json:"deviceName"`
-	SerialNumber string                   `json:"serialNumber"`
-	AdminName    string                   `json:"adminName"`
-	Period       string                   `json:"period"`
-	Keyshots     []map[string]interface{} `json:"keyshots"`
-	BirdName     string                   `json:"birdName"`
-	BirdLatin    string                   `json:"birdLatin"`
-	BirdConfidence float64                `json:"birdConfidence"`
-	ImageUrl     string                   `json:"imageUrl"`
-	VideoUrl     string                   `json:"videoUrl"`
+	TraceId        string  `json:"traceId"`
+	Timestamp      string  `json:"timestamp"`
+	DeviceName     string  `json:"deviceName"`
+	SerialNumber   string  `json:"serialNumber"`
+	AdminName      string  `json:"adminName"`
+	Period         string  `json:"period"`
+	BirdName       string  `json:"birdName"`
+	BirdLatin      string  `json:"birdLatin"`
+	BirdConfidence float64 `json:"birdConfidence"`
+	KeyShotUrl     string  `json:"keyShotUrl"`
+	ImageUrl       string  `json:"imageUrl"`
+	VideoUrl       string  `json:"videoUrl"`
+	
+	// Internal field - not exported to JSON
+	keyshots       []map[string]interface{} `json:"-"`
 }
 
 var hours int
@@ -244,6 +247,10 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 				// Copy needed fields
 				if url, ok := ksMap["imageUrl"].(string); ok {
 					newKeyshot["imageUrl"] = url
+					// Extract the first keyshot URL for the flat structure
+					if event.KeyShotUrl == "" {
+						event.KeyShotUrl = url
+					}
 				}
 				if msg, ok := ksMap["message"].(string); ok {
 					newKeyshot["message"] = msg
@@ -257,9 +264,9 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 				transformedKeyshots = append(transformedKeyshots, newKeyshot)
 			}
 		}
-		event.Keyshots = transformedKeyshots
+		event.keyshots = transformedKeyshots
 	} else {
-		event.Keyshots = []map[string]interface{}{}
+		event.keyshots = []map[string]interface{}{}
 	}
 
 	return event
