@@ -53,7 +53,7 @@ var searchCmd = &cobra.Command{
 		startTimestamp := fmt.Sprintf("%d", start.Unix())
 		endTimestamp := fmt.Sprintf("%d", end.Unix())
 
-		eventsReq := EventsRequest{
+		eventsReq := Request{
 			StartTimestamp: startTimestamp,
 			EndTimestamp:   endTimestamp,
 			Language:       "en",
@@ -95,7 +95,7 @@ var searchCmd = &cobra.Command{
 			fmt.Println("--------------------------------------------------------------------------------------------------")
 			for _, event := range filteredEvents {
 				fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
-					event.TraceId,
+					event.TraceID,
 					event.Timestamp,
 					event.DeviceName,
 					event.BirdName,

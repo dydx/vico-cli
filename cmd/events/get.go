@@ -13,7 +13,7 @@ import (
 // EventRequest represents the JSON request body sent to the Vicohome API
 // when fetching a specific event by its trace ID.
 type EventRequest struct {
-	TraceId   string `json:"traceId"`   // Unique identifier for the event
+	TraceID   string `json:"traceId"`   // Unique identifier for the event
 	Language  string `json:"language"`  // Language code (e.g., "en" for English)
 	CountryNo string `json:"countryNo"` // Country code (e.g., "US" for United States)
 }
@@ -53,7 +53,7 @@ var getCmd = &cobra.Command{
 			// Output formatted table
 			fmt.Println("Event Details:")
 			fmt.Println("------------------------------")
-			fmt.Printf("Trace ID:       %s\n", event.TraceId)
+			fmt.Printf("Trace ID:       %s\n", event.TraceID)
 			fmt.Printf("Timestamp:      %s\n", event.Timestamp)
 			fmt.Printf("Device Name:    %s\n", event.DeviceName)
 			fmt.Printf("Serial Number:  %s\n", event.SerialNumber)
@@ -64,9 +64,9 @@ var getCmd = &cobra.Command{
 			if event.BirdConfidence > 0 {
 				fmt.Printf("Confidence:     %.2f%%\n", event.BirdConfidence*100)
 			}
-			fmt.Printf("KeyShot URL:    %s\n", event.KeyShotUrl)
-			fmt.Printf("Image URL:      %s\n", event.ImageUrl)
-			fmt.Printf("Video URL:      %s\n", event.VideoUrl)
+			fmt.Printf("KeyShot URL:    %s\n", event.KeyShotURL)
+			fmt.Printf("Image URL:      %s\n", event.ImageURL)
+			fmt.Printf("Video URL:      %s\n", event.VideoURL)
 		}
 	},
 }
@@ -81,7 +81,7 @@ func init() {
 // This function handles the API request, response parsing, and error handling.
 func getEvent(token string, traceID string) (Event, error) {
 	req := EventRequest{
-		TraceId:   traceID,
+		TraceID:   traceID,
 		Language:  "en",
 		CountryNo: "US",
 	}
@@ -125,7 +125,7 @@ func getEvent(token string, traceID string) (Event, error) {
 	}
 
 	// First check if data has the traceId field, which indicates it's an event
-	if _, hasTraceId := data["traceId"].(string); hasTraceId {
+	if _, hasTraceID := data["traceId"].(string); hasTraceID {
 		return transformRawEvent(data), nil
 	}
 

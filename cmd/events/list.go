@@ -11,9 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// EventsRequest represents the JSON request body sent to the Vicohome API
+// Request represents the JSON request body sent to the Vicohome API
 // when fetching events within a specific time range.
-type EventsRequest struct {
+type Request struct {
 	StartTimestamp string `json:"startTimestamp"` // Start time in Unix timestamp format
 	EndTimestamp   string `json:"endTimestamp"`   // End time in Unix timestamp format
 	Language       string `json:"language"`       // Language code (e.g., "en" for English)
@@ -24,7 +24,7 @@ type EventsRequest struct {
 // This structure contains information about bird sightings, including metadata
 // about the device that captured the event, the bird identified, and media URLs.
 type Event struct {
-	TraceId        string  `json:"traceId"`
+	TraceID        string  `json:"traceId"`
 	Timestamp      string  `json:"timestamp"`
 	DeviceName     string  `json:"deviceName"`
 	SerialNumber   string  `json:"serialNumber"`
@@ -33,9 +33,9 @@ type Event struct {
 	BirdName       string  `json:"birdName"`
 	BirdLatin      string  `json:"birdLatin"`
 	BirdConfidence float64 `json:"birdConfidence"`
-	KeyShotUrl     string  `json:"keyShotUrl"`
-	ImageUrl       string  `json:"imageUrl"`
-	VideoUrl       string  `json:"videoUrl"`
+	KeyShotURL     string  `json:"keyShotUrl"`
+	ImageURL       string  `json:"imageUrl"`
+	VideoURL       string  `json:"videoUrl"`
 
 	// Internal field - not exported to JSON
 	keyshots []map[string]interface{} `json:"-"`
@@ -64,7 +64,7 @@ var listCmd = &cobra.Command{
 		startTimestamp := fmt.Sprintf("%d", start.Unix())
 		endTimestamp := fmt.Sprintf("%d", end.Unix())
 
-		eventsReq := EventsRequest{
+		eventsReq := Request{
 			StartTimestamp: startTimestamp,
 			EndTimestamp:   endTimestamp,
 			Language:       "en",
@@ -98,7 +98,7 @@ var listCmd = &cobra.Command{
 			fmt.Println("--------------------------------------------------------------------------------------------------")
 			for _, event := range events {
 				fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
-					event.TraceId,
+					event.TraceID,
 					event.Timestamp,
 					event.DeviceName,
 					event.BirdName,
@@ -114,10 +114,10 @@ func init() {
 }
 
 // fetchEvents retrieves events from the Vicohome API within the specified time range.
-// It takes an authentication token and an EventsRequest object containing the time range
+// It takes an authentication token and a Request object containing the time range
 // parameters, and returns a slice of Event objects and any error encountered.
 // This function handles the API request, response parsing, and error handling.
-func fetchEvents(token string, request EventsRequest) ([]Event, error) {
+func fetchEvents(token string, request Request) ([]Event, error) {
 	reqBody, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("error marshaling request: %w", err)
@@ -183,7 +183,7 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 
 	// Extract string fields
 	if val, ok := eventMap["traceId"].(string); ok {
-		event.TraceId = val
+		event.TraceID = val
 	}
 
 	// Fix: Handle timestamp as a number
@@ -213,10 +213,10 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 	}
 
 	if val, ok := eventMap["imageUrl"].(string); ok {
-		event.ImageUrl = val
+		event.ImageURL = val
 	}
 	if val, ok := eventMap["videoUrl"].(string); ok {
-		event.VideoUrl = val
+		event.VideoURL = val
 	}
 
 	// Set default bird name
@@ -257,8 +257,8 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 				if url, ok := ksMap["imageUrl"].(string); ok {
 					newKeyshot["imageUrl"] = url
 					// Extract the first keyshot URL for the flat structure
-					if event.KeyShotUrl == "" {
-						event.KeyShotUrl = url
+					if event.KeyShotURL == "" {
+						event.KeyShotURL = url
 					}
 				}
 				if msg, ok := ksMap["message"].(string); ok {
