@@ -64,22 +64,6 @@ var getCmd = &cobra.Command{
 			fmt.Printf("KeyShot URL:    %s\n", event.KeyShotUrl)
 			fmt.Printf("Image URL:      %s\n", event.ImageUrl)
 			fmt.Printf("Video URL:      %s\n", event.VideoUrl)
-			fmt.Println("\nKeyshots:")
-			for i, keyshot := range event.keyshots {
-				fmt.Printf("\nKeyshot %d:\n", i+1)
-				if url, ok := keyshot["imageUrl"].(string); ok {
-					fmt.Printf("  Image URL: %s\n", url)
-				}
-				if msg, ok := keyshot["message"].(string); ok {
-					fmt.Printf("  Message: %s\n", msg)
-				}
-				if cat, ok := keyshot["objectCategory"].(string); ok {
-					fmt.Printf("  Object Category: %s\n", cat)
-				}
-				if sub, ok := keyshot["subCategoryName"].(string); ok {
-					fmt.Printf("  Subcategory: %s\n", sub)
-				}
-			}
 		}
 	},
 }

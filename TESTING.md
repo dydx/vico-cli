@@ -101,6 +101,25 @@ Trace ID                             Timestamp            Device Name           
 ]
 ```
 
+### `./vico-cli events get <>` [PASS]
+
+```bash
+➜  vicohome git:(main) ✗ ./vico-cli events get 018594221744243886k4jua3TyFQq
+Event Details:
+------------------------------
+Trace ID:       018594221744243886k4jua3TyFQq
+Timestamp:      2025-04-09 20:11:24
+Device Name:    Birdies
+Serial Number:  378b660598295ceca8b20871991a0409
+Admin Name:     jpsandlin
+Period:         19.66s
+Bird Name:      Unidentified
+Bird Latin:     
+KeyShot URL:    https://a4x-prod-us.s3.amazonaws.com/ai-saas-out-storage/keyshot_front_bird_018594221744243886k4jua3TyFQq_countryNo_US.jpg
+Image URL:      https://a4x-prod-us.s3.amazonaws.com/ai-saas-out-storage/018594221744243886k4jua3TyFQq_gallery.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250410T021654Z&X-Amz-SignedHeaders=host&X-Amz-Expires=172800&X-Amz-Credential=AKIAQBFG53LBAA5AEUVF%2F20250410%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=bda0dc1a76f22ba659050ba5ff7882206e7e0ad9dd84b4154fd6c72d0984af7a
+Video URL:      https://api-us.vicohome.io/video/download/m3u8/018594221744243886k4jua3TyFQq.m3u8?token=eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOjE4NTk0MjIsInRyYWNlSWQiOiIwMTg1OTQyMjE3NDQyNDM4ODZrNGp1YTNUeUZRcSIsImV4cCI6MTc0NDQyNDIxNH0.H44qdq7n7s6jDfeM_3k7f00DwEpFSoiMXdFyXtnPZ1dr6zDBgUXzbuS758RYBdQ1XixzE9MjvSmFvQ-jyZpUgA
+```
+
 ### `./vico-cli events get <> --format json` [PASS]
 
 ```bash
