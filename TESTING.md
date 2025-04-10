@@ -139,3 +139,60 @@ Video URL:      https://api-us.vicohome.io/video/download/m3u8/01859422174424388
   "videoUrl": "https://api-us.vicohome.io/video/download/m3u8/018594221744243886k4jua3TyFQq.m3u8?token=eyJhbGciOiJIUzUxMiJ9.eyJ1c2VySWQiOjE4NTk0MjIsInRyYWNlSWQiOiIwMTg1OTQyMjE3NDQyNDM4ODZrNGp1YTNUeUZRcSIsImV4cCI6MTc0NDQyMzU0OH0.0f43zpnBQ6Xydq5asTsF5D5oHB69HAnZj7_42aeJW_wxE04TW4XT_uvQckr8Q5jA3-d0anwaYbtqjlfDfVST-Q"
 }
 ```
+
+## Events Search
+
+### `./vico-cli events search --field serialNumber <>` [FAIL]
+
+```bash
+➜  vicohome git:(main) ✗ ./vico-cli events search --field serialNumber 378b660598295ceca8b20871991a0409
+Error: unknown flag: --field
+Usage:
+  vico-cli events [command]
+
+Available Commands:
+  get         Get details for a specific event
+  list        List events from the last N hours
+
+Flags:
+  -h, --help   help for events
+
+Use "vico-cli events [command] --help" for more information about a command.
+
+```
+
+### `./vico-cli events search --field birdName <>` [FAIL]
+
+```bash
+➜  vicohome git:(main) ✗ ./vico-cli events search --field birdName "Eastern Phoebe"
+Error: unknown flag: --field
+Usage:
+  vico-cli events [command]
+
+Available Commands:
+  get         Get details for a specific event
+  list        List events from the last N hours
+
+Flags:
+  -h, --help   help for events
+
+Use "vico-cli events [command] --help" for more information about a command.
+```
+
+### `./vico-cli events search --field deviceName <>` [FAIL]
+
+```bash
+➜  vicohome git:(main) ✗ ./vico-cli events search --field deviceName "Birdies"
+Error: unknown flag: --field
+Usage:
+  vico-cli events [command]
+
+Available Commands:
+  get         Get details for a specific event
+  list        List events from the last N hours
+
+Flags:
+  -h, --help   help for events
+
+Use "vico-cli events [command] --help" for more information about a command.
+```

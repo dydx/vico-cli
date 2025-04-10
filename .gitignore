@@ -5,6 +5,7 @@
 *.so
 *.dylib
 vicohome
+vico-cli
 
 # Test binary, built with `go test -c`
 *.test
