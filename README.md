@@ -48,7 +48,7 @@ Download the pre-built binary for your platform from the [Releases page](https:/
 ### Build from Source
 
 ```bash
-go build -o vicohome main.go
+go build -o vico-cli main.go
 ```
 
 ## Usage
