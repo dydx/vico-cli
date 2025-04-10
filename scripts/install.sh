@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Vicohome CLI Installer
+# vico-cli CLI Installer
 # This script detects your OS/architecture and installs the appropriate binary
 
 set -e
@@ -18,7 +18,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}Installing Vicohome CLI...${NC}"
+echo -e "${BLUE}Installing vico-cli CLI...${NC}"
 
 # Version handling
 if [ -z "$1" ]; then
@@ -46,16 +46,16 @@ fi
 # Handle OS detection
 case "$OS" in
   darwin)
-    BINARY_NAME="vicohome-darwin-${ARCH}"
+    BINARY_NAME="vico-cli-darwin-${ARCH}"
     ;;
   linux)
-    BINARY_NAME="vicohome-linux-${ARCH}"
+    BINARY_NAME="vico-cli-linux-${ARCH}"
     ;;
   mingw*|msys*|cygwin*|windows*)
     OS="windows"
-    BINARY_NAME="vicohome-windows-${ARCH}.exe"
+    BINARY_NAME="vico-cli-windows-${ARCH}.exe"
     INSTALL_DIR="$HOME/bin"
-    REPO_NAME="vicohome.exe"
+    REPO_NAME="vico-cli.exe"
     ;;
   *)
     echo -e "${RED}Unsupported operating system: $OS${NC}"
@@ -99,10 +99,10 @@ fi
 
 # Verify installation
 if [ -x "$INSTALL_DIR/$REPO_NAME" ] || [ "$OS" = "windows" ]; then
-  echo -e "${GREEN}Successfully installed Vicohome CLI to ${INSTALL_DIR}/${REPO_NAME}${NC}"
+  echo -e "${GREEN}Successfully installed vico-cli CLI to ${INSTALL_DIR}/${REPO_NAME}${NC}"
   echo -e "\nTo use the CLI, you need to set up your credentials:"
-  echo -e "${YELLOW}export VICOHOME_EMAIL=\"your.email@example.com\"${NC}"
-  echo -e "${YELLOW}export VICOHOME_PASSWORD=\"your-password\"${NC}"
+  echo -e "${YELLOW}export vico-cli_EMAIL=\"your.email@example.com\"${NC}"
+  echo -e "${YELLOW}export vico-cli_PASSWORD=\"your-password\"${NC}"
   echo -e "\nYou can now run: ${GREEN}${REPO_NAME} devices list${NC}"
 else
   echo -e "${RED}Installation failed. Please try again or install manually.${NC}"
