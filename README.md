@@ -10,9 +10,21 @@ A command-line interface tool for interacting with the Vicohome API to fetch and
 
 ## Installation
 
-### Download Binary
+### Quick Install (Recommended)
 
-Download the pre-built binary for your platform from the [Releases page](https://github.com/dydx/vico-cli/releases).
+Install the latest version with our installation script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dydx/vico-cli/main/scripts/install.sh | bash
+```
+
+The script will automatically detect your operating system and architecture, then install the appropriate binary.
+
+To install a specific version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dydx/vico-cli/main/scripts/install.sh | bash -s v1.0.0
+```
 
 ### Docker
 
@@ -28,6 +40,10 @@ docker run --rm -e VICOHOME_EMAIL="your.email@example.com" -e VICOHOME_PASSWORD=
 # You can specify a version tag
 docker run --rm ghcr.io/dydx/vicohome:v1.0.0 events list --format json
 ```
+
+### Download Binary Manually
+
+Download the pre-built binary for your platform from the [Releases page](https://github.com/dydx/vico-cli/releases).
 
 ### Build from Source
 

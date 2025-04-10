@@ -16,22 +16,22 @@ jobs:
         include:
           - goarch: amd64
             goos: darwin
-            artifact_name: vicohome-darwin-amd64
+            artifact_name: vico-cli-darwin-amd64
           - goarch: arm64
             goos: darwin
-            artifact_name: vicohome-darwin-arm64
+            artifact_name: vico-cli-darwin-arm64
           - goarch: amd64
             goos: linux
-            artifact_name: vicohome-linux-amd64
+            artifact_name: vico-cli-linux-amd64
           - goarch: arm64
             goos: linux
-            artifact_name: vicohome-linux-arm64
+            artifact_name: vico-cli-linux-arm64
           - goarch: amd64
             goos: windows
-            artifact_name: vicohome-windows-amd64.exe
+            artifact_name: vico-cli-windows-amd64.exe
           - goarch: arm64
             goos: windows
-            artifact_name: vicohome-windows-arm64.exe
+            artifact_name: vico-cli-windows-arm64.exe
 
     steps:
       - name: Checkout code
@@ -95,14 +95,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository_owner }}/vicohome
+          images: ghcr.io/${{ github.repository_owner }}/vico-cli
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest
           labels: |
-            org.opencontainers.image.title=Vicohome CLI
-            org.opencontainers.image.description=A command-line interface for interacting with the Vicohome API
+            org.opencontainers.image.title=vico-cli CLI
+            org.opencontainers.image.description=A command-line interface for interacting with the vico-cli API
             org.opencontainers.image.version=${{ env.VERSION }}
             org.opencontainers.image.licenses=MIT
 
@@ -121,7 +121,7 @@ jobs:
       - name: Test Docker image
         run: |
           # Pull and test the image once it's available
-          docker run --rm ghcr.io/${{ github.repository_owner }}/vicohome:latest version
+          docker run --rm ghcr.io/${{ github.repository_owner }}/vico-cli:latest version
       
       - name: Create Docker info file
         run: |
@@ -131,14 +131,14 @@ jobs:
           Multi-architecture Docker image (amd64, arm64) is available:
           
           \`\`\`bash
-          docker pull ghcr.io/${{ github.repository_owner }}/vicohome:${{ env.VERSION }}
-          docker pull ghcr.io/${{ github.repository_owner }}/vicohome:latest
+          docker pull ghcr.io/${{ github.repository_owner }}/vico-cli:${{ env.VERSION }}
+          docker pull ghcr.io/${{ github.repository_owner }}/vico-cli:latest
           \`\`\`
           
           Run it:
           
           \`\`\`bash
-          docker run --rm ghcr.io/${{ github.repository_owner }}/vicohome:latest version
+          docker run --rm ghcr.io/${{ github.repository_owner }}/vico-cli:latest version
           \`\`\`
           EOF
       
@@ -170,7 +170,7 @@ jobs:
       - name: Prepare release body
         run: |
           # Start with an empty release body
-          echo "## Vicohome CLI ${{ env.VERSION }}" > release-body.md
+          echo "## vico-cli CLI ${{ env.VERSION }}" > release-body.md
           echo "" >> release-body.md
           echo "### Installation" >> release-body.md
           echo "" >> release-body.md
@@ -189,9 +189,9 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ./artifacts/vicohome-darwin-amd64/vicohome-darwin-amd64
-            ./artifacts/vicohome-darwin-arm64/vicohome-darwin-arm64
-            ./artifacts/vicohome-linux-amd64/vicohome-linux-amd64
-            ./artifacts/vicohome-linux-arm64/vicohome-linux-arm64
-            ./artifacts/vicohome-windows-amd64.exe/vicohome-windows-amd64.exe
-            ./artifacts/vicohome-windows-arm64.exe/vicohome-windows-arm64.exe
+            ./artifacts/vico-cli-darwin-amd64/vico-cli-darwin-amd64
+            ./artifacts/vico-cli-darwin-arm64/vico-cli-darwin-arm64
+            ./artifacts/vico-cli-linux-amd64/vico-cli-linux-amd64
+            ./artifacts/vico-cli-linux-arm64/vico-cli-linux-arm64
+            ./artifacts/vico-cli-windows-amd64.exe/vico-cli-windows-amd64.exe
+            ./artifacts/vico-cli-windows-arm64.exe/vico-cli-windows-arm64.exe

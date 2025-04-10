@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
@@ -121,16 +120,10 @@ func fetchEvents(token string, request EventsRequest) ([]Event, error) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", token)
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	// Use ExecuteWithRetry for automatic token refresh
+	respBody, err := auth.ExecuteWithRetry(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
 
 	// Parse response

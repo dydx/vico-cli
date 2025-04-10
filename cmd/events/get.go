@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/dydx/vico-cli/pkg/auth"
@@ -93,16 +92,10 @@ func getEvent(token string, traceID string) (Event, error) {
 	httpReq.Header.Set("Accept", "application/json")
 	httpReq.Header.Set("Authorization", token)
 
-	client := &http.Client{}
-	resp, err := client.Do(httpReq)
+	// Use ExecuteWithRetry for automatic token refresh
+	respBody, err := auth.ExecuteWithRetry(httpReq)
 	if err != nil {
 		return Event{}, fmt.Errorf("error making request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return Event{}, fmt.Errorf("error reading response body: %w", err)
 	}
 
 	// Parse response

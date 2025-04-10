@@ -14,6 +14,7 @@ func init() {
 	// Add subcommands
 	eventsCmd.AddCommand(listCmd)
 	eventsCmd.AddCommand(getCmd)
+	eventsCmd.AddCommand(searchCmd)
 }
 
 // GetEventsCmd returns the events command

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/dydx/vico-cli/pkg/auth"
@@ -91,16 +90,10 @@ func getDevice(token string, serialNumber string) (Device, error) {
 	httpReq.Header.Set("Accept", "application/json")
 	httpReq.Header.Set("Authorization", token)
 
-	client := &http.Client{}
-	resp, err := client.Do(httpReq)
+	// Use ExecuteWithRetry for automatic token refresh
+	respBody, err := auth.ExecuteWithRetry(httpReq)
 	if err != nil {
 		return Device{}, fmt.Errorf("error making request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return Device{}, fmt.Errorf("error reading response body: %w", err)
 	}
 
 	// Parse response
@@ -109,10 +102,15 @@ func getDevice(token string, serialNumber string) (Device, error) {
 		return Device{}, fmt.Errorf("error unmarshaling response: %w\nResponse: %s", err, string(respBody))
 	}
 
-	// Check for API errors
-	if result, ok := responseMap["result"].(float64); ok && result != 0 {
-		msg, _ := responseMap["msg"].(string)
-		return Device{}, fmt.Errorf("API error: %s (code: %.0f)", msg, result)
+	// Check if we need to refresh the token
+	needsRefresh, apiError := auth.ValidateResponse(respBody)
+	if apiError != nil {
+		// There was an API error, but it's not a auth error requiring a retry
+		if !needsRefresh {
+			return Device{}, apiError
+		}
+		// Auth error was handled by ValidateResponse, but we should return with the error
+		return Device{}, fmt.Errorf("authentication error: %v", apiError)
 	}
 
 	// Extract device data
