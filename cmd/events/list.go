@@ -27,6 +27,9 @@ type Event struct {
 	AdminName    string                   `json:"adminName"`
 	Period       string                   `json:"period"`
 	Keyshots     []map[string]interface{} `json:"keyshots"`
+	BirdName     string                   `json:"birdName"`
+	BirdLatin    string                   `json:"birdLatin"`
+	BirdConfidence float64                `json:"birdConfidence"`
 	ImageUrl     string                   `json:"imageUrl"`
 	VideoUrl     string                   `json:"videoUrl"`
 }
@@ -80,15 +83,16 @@ var listCmd = &cobra.Command{
 			fmt.Println(string(prettyJSON))
 		} else {
 			// Output table format
-			fmt.Printf("%-36s %-20s %-30s %-36s\n", 
-				"Trace ID", "Timestamp", "Device Name", "Serial Number")
-			fmt.Println("------------------------------------------------------------------------------------------------")
+			fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n", 
+				"Trace ID", "Timestamp", "Device Name", "Bird Name", "Bird Latin")
+			fmt.Println("--------------------------------------------------------------------------------------------------")
 			for _, event := range events {
-				fmt.Printf("%-36s %-20s %-30s %-36s\n", 
+				fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n", 
 					event.TraceId, 
 					event.Timestamp,
 					event.DeviceName,
-					event.SerialNumber)
+					event.BirdName,
+					event.BirdLatin)
 			}
 		}
 	},
@@ -169,9 +173,16 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 	if val, ok := eventMap["traceId"].(string); ok {
 		event.TraceId = val
 	}
-	if val, ok := eventMap["timestamp"].(string); ok {
+	
+	// Fix: Handle timestamp as a number
+	if val, ok := eventMap["timestamp"].(float64); ok {
+		// Convert Unix timestamp to human-readable format
+		t := time.Unix(int64(val), 0)
+		event.Timestamp = t.Format("2006-01-02 15:04:05")
+	} else if val, ok := eventMap["timestamp"].(string); ok {
 		event.Timestamp = val
 	}
+	
 	if val, ok := eventMap["deviceName"].(string); ok {
 		event.DeviceName = val
 	}
@@ -181,14 +192,46 @@ func transformRawEvent(eventMap map[string]interface{}) Event {
 	if val, ok := eventMap["adminName"].(string); ok {
 		event.AdminName = val
 	}
-	if val, ok := eventMap["period"].(string); ok {
+	
+	// Fix: Handle period as a number
+	if val, ok := eventMap["period"].(float64); ok {
+		event.Period = fmt.Sprintf("%.2fs", val)
+	} else if val, ok := eventMap["period"].(string); ok {
 		event.Period = val
 	}
+	
 	if val, ok := eventMap["imageUrl"].(string); ok {
 		event.ImageUrl = val
 	}
 	if val, ok := eventMap["videoUrl"].(string); ok {
 		event.VideoUrl = val
+	}
+
+	// Set default bird name
+	event.BirdName = "Unidentified"
+	
+	// Process subcategoryInfoList for bird data
+	if subcategoryInfoList, ok := eventMap["subcategoryInfoList"].([]interface{}); ok && len(subcategoryInfoList) > 0 {
+		for _, info := range subcategoryInfoList {
+			if infoMap, ok := info.(map[string]interface{}); ok {
+				// Check if this is a bird entry
+				if objectType, ok := infoMap["objectType"].(string); ok && objectType == "bird" {
+					// Extract bird name
+					if birdName, ok := infoMap["objectName"].(string); ok {
+						event.BirdName = birdName
+					}
+					// Extract Latin name
+					if birdLatin, ok := infoMap["birdStdName"].(string); ok {
+						event.BirdLatin = birdLatin
+					}
+					// Extract confidence
+					if confidence, ok := infoMap["confidence"].(float64); ok {
+						event.BirdConfidence = confidence
+					}
+					break
+				}
+			}
+		}
 	}
 
 	// Handle the keyshots field separately

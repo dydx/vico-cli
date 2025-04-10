@@ -56,6 +56,11 @@ var getCmd = &cobra.Command{
 			fmt.Printf("Serial Number:  %s\n", event.SerialNumber)
 			fmt.Printf("Admin Name:     %s\n", event.AdminName)
 			fmt.Printf("Period:         %s\n", event.Period)
+			fmt.Printf("Bird Name:      %s\n", event.BirdName)
+			fmt.Printf("Bird Latin:     %s\n", event.BirdLatin)
+			if event.BirdConfidence > 0 {
+				fmt.Printf("Confidence:     %.2f%%\n", event.BirdConfidence*100)
+			}
 			fmt.Printf("Image URL:      %s\n", event.ImageUrl)
 			fmt.Printf("Video URL:      %s\n", event.VideoUrl)
 			fmt.Println("\nKeyshots:")
