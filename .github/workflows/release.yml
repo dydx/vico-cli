@@ -1,0 +1,147 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        include:
+          - goarch: amd64
+            goos: darwin
+            artifact_name: vicohome-darwin-amd64
+          - goarch: arm64
+            goos: darwin
+            artifact_name: vicohome-darwin-arm64
+          - goarch: amd64
+            goos: linux
+            artifact_name: vicohome-linux-amd64
+          - goarch: arm64
+            goos: linux
+            artifact_name: vicohome-linux-arm64
+          - goarch: amd64
+            goos: windows
+            artifact_name: vicohome-windows-amd64.exe
+          - goarch: arm64
+            goos: windows
+            artifact_name: vicohome-windows-arm64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          go build -ldflags="-X 'github.com/dydx/vico-cli/cmd.Version=${VERSION}'" -o ${{ matrix.artifact_name }} main.go
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ./${{ matrix.artifact_name }}
+
+  create-release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: Release ${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            ./artifacts/vicohome-darwin-amd64/vicohome-darwin-amd64
+            ./artifacts/vicohome-darwin-arm64/vicohome-darwin-arm64
+            ./artifacts/vicohome-linux-amd64/vicohome-linux-amd64
+            ./artifacts/vicohome-linux-arm64/vicohome-linux-arm64
+            ./artifacts/vicohome-windows-amd64.exe/vicohome-windows-amd64.exe
+            ./artifacts/vicohome-windows-arm64.exe/vicohome-windows-arm64.exe
+
+  publish-to-github-packages:
+    name: Publish to GitHub Packages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Prepare artifacts directory
+        run: |
+          mkdir -p ./dist
+          cp ./artifacts/vicohome-linux-amd64/vicohome-linux-amd64 ./dist/vicohome-linux-amd64
+          cp ./artifacts/vicohome-linux-arm64/vicohome-linux-arm64 ./dist/vicohome-linux-arm64
+          chmod +x ./dist/*
+
+      - name: Build and push multi-platform Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile.multi
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/vicohome:latest
+            ghcr.io/${{ github.repository_owner }}/vicohome:${{ env.VERSION }}

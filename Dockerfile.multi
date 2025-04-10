@@ -1,0 +1,22 @@
+FROM debian:bookworm-slim
+
+ARG TARGETPLATFORM
+ARG TARGETARCH
+
+WORKDIR /app
+
+# Copy the appropriate binary based on the target architecture
+COPY dist/vicohome-linux-${TARGETARCH} /app/vicohome
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Make executable
+RUN chmod +x /app/vicohome
+
+# Create a non-root user to run the application
+RUN useradd -m appuser
+USER appuser
+
+ENTRYPOINT ["/app/vicohome"]
