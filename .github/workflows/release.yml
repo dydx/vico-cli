@@ -6,8 +6,9 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    name: Build and Release
+  # First job: Build binaries for all platforms
+  build-binaries:
+    name: Build Binaries
     runs-on: ubuntu-latest
     
     strategy:
@@ -60,47 +61,11 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ./${{ matrix.artifact_name }}
 
-  create-release:
-    name: Create Release
-    needs: build
+  # Second job: Build and publish Docker image
+  build-docker:
+    name: Build Docker Image
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Get version
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./artifacts
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.VERSION }}
-          name: Release ${{ env.VERSION }}
-          draft: false
-          prerelease: false
-          files: |
-            ./artifacts/vicohome-darwin-amd64/vicohome-darwin-amd64
-            ./artifacts/vicohome-darwin-arm64/vicohome-darwin-arm64
-            ./artifacts/vicohome-linux-amd64/vicohome-linux-amd64
-            ./artifacts/vicohome-linux-arm64/vicohome-linux-arm64
-            ./artifacts/vicohome-windows-amd64.exe/vicohome-windows-amd64.exe
-            ./artifacts/vicohome-windows-arm64.exe/vicohome-windows-arm64.exe
-
-  publish-to-github-packages:
-    name: Publish to GitHub Packages
-    needs: build
-    runs-on: ubuntu-latest
+    needs: build-binaries
     permissions:
       contents: read
       packages: write
@@ -157,25 +122,76 @@ jobs:
         run: |
           # Pull and test the image once it's available
           docker run --rm ghcr.io/${{ github.repository_owner }}/vicohome:latest version
+      
+      - name: Create Docker info file
+        run: |
+          cat > docker-info.md << EOF
+          ## Docker Image
           
-      - name: Add Docker image info to release notes
+          Multi-architecture Docker image (amd64, arm64) is available:
+          
+          \`\`\`bash
+          docker pull ghcr.io/${{ github.repository_owner }}/vicohome:${{ env.VERSION }}
+          docker pull ghcr.io/${{ github.repository_owner }}/vicohome:latest
+          \`\`\`
+          
+          Run it:
+          
+          \`\`\`bash
+          docker run --rm ghcr.io/${{ github.repository_owner }}/vicohome:latest version
+          \`\`\`
+          EOF
+      
+      - name: Upload Docker info
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-info
+          path: ./docker-info.md
+
+  # Third job: Create GitHub release with all assets
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build-binaries, build-docker]
+    permissions:
+      contents: write
+      packages: read
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      
+      - name: Get version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      
+      - name: Prepare release body
+        run: |
+          # Start with an empty release body
+          echo "## Vicohome CLI ${{ env.VERSION }}" > release-body.md
+          echo "" >> release-body.md
+          echo "### Installation" >> release-body.md
+          echo "" >> release-body.md
+          echo "Download the binary for your platform and architecture." >> release-body.md
+          echo "" >> release-body.md
+          
+          # Add the Docker info
+          cat ./artifacts/docker-info/docker-info.md >> release-body.md
+      
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.VERSION }}
-          append_body: true
-          body: |
-            
-            ## Docker Image
-            
-            Multi-architecture Docker image (amd64, arm64) is available:
-            
-            ```bash
-            docker pull ghcr.io/${{ github.repository_owner }}/vicohome:${{ env.VERSION }}
-            docker pull ghcr.io/${{ github.repository_owner }}/vicohome:latest
-            ```
-            
-            Run it:
-            
-            ```bash
-            docker run --rm ghcr.io/${{ github.repository_owner }}/vicohome:latest version
-            ```
+          name: Release ${{ env.VERSION }}
+          body_path: release-body.md
+          draft: false
+          prerelease: false
+          files: |
+            ./artifacts/vicohome-darwin-amd64/vicohome-darwin-amd64
+            ./artifacts/vicohome-darwin-arm64/vicohome-darwin-arm64
+            ./artifacts/vicohome-linux-amd64/vicohome-linux-amd64
+            ./artifacts/vicohome-linux-arm64/vicohome-linux-arm64
+            ./artifacts/vicohome-windows-amd64.exe/vicohome-windows-amd64.exe
+            ./artifacts/vicohome-windows-arm64.exe/vicohome-windows-arm64.exe
