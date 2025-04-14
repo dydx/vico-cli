@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dydx/vico-cli/cmd/events"
+	"github.com/dydx/vico-cli/pkg/models"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 )
 
-// Handler implements the OutputHandler interface for InfluxDB.
+// Handler implements the output.Handler interface for InfluxDB.
 type Handler struct {
 	client     influxdb2.Client
 	writeAPI   api.WriteAPI
@@ -47,7 +47,7 @@ func NewHandler(url, org, bucket, token string) (*Handler, error) {
 }
 
 // Write writes events to InfluxDB.
-func (h *Handler) Write(events []events.Event) error {
+func (h *Handler) Write(events []models.Event) error {
 	if len(events) == 0 {
 		fmt.Println("No events to write to InfluxDB")
 		return nil

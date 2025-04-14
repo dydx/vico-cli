@@ -10,10 +10,10 @@ import (
 	"github.com/dydx/vico-cli/pkg/output/stdout"
 )
 
-// OutputHandler defines the interface for handling event output.
+// Handler defines the interface for handling event output.
 // Implementations of this interface can output events to different destinations
 // (e.g., stdout, InfluxDB) in different formats (e.g., table, JSON).
-type OutputHandler interface {
+type Handler interface {
 	// Write outputs the events using the configured format and destination.
 	Write(events []models.Event) error
 
@@ -21,8 +21,8 @@ type OutputHandler interface {
 	Close()
 }
 
-// Factory creates an OutputHandler based on the specified destination and format.
-func Factory(destination, format string, cfg Config) (OutputHandler, error) {
+// Factory creates a Handler based on the specified destination and format.
+func Factory(destination, format string, cfg Config) (Handler, error) {
 	switch destination {
 	case "stdout":
 		return NewStdoutHandler(format), nil
@@ -47,7 +47,7 @@ func LoadConfigFromEnv() Config {
 }
 
 // NewStdoutHandler creates a new stdout output handler.
-func NewStdoutHandler(format string) OutputHandler {
+func NewStdoutHandler(format string) Handler {
 	switch format {
 	case "json":
 		return stdout.NewJSONHandler()
@@ -57,7 +57,7 @@ func NewStdoutHandler(format string) OutputHandler {
 }
 
 // NewInfluxDBHandler creates a new InfluxDB output handler.
-func NewInfluxDBHandler(cfg Config) (OutputHandler, error) {
+func NewInfluxDBHandler(cfg Config) (Handler, error) {
 	// Validate required configuration
 	if cfg.InfluxURL == "" {
 		return nil, fmt.Errorf("InfluxDB URL is required")

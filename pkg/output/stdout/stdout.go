@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/dydx/vico-cli/cmd/events"
+	"github.com/dydx/vico-cli/pkg/models"
 )
 
 // JSONHandler outputs events in JSON format to stdout.
@@ -17,7 +17,7 @@ func NewJSONHandler() *JSONHandler {
 }
 
 // Write outputs the events in JSON format to stdout.
-func (h *JSONHandler) Write(events []events.Event) error {
+func (h *JSONHandler) Write(events []models.Event) error {
 	prettyJSON, err := json.MarshalIndent(events, "", "  ")
 	if err != nil {
 		return fmt.Errorf("error formatting JSON: %w", err)
@@ -40,7 +40,7 @@ func NewTableHandler() *TableHandler {
 }
 
 // Write outputs the events in table format to stdout.
-func (h *TableHandler) Write(events []events.Event) error {
+func (h *TableHandler) Write(events []models.Event) error {
 	if len(events) == 0 {
 		fmt.Println("No events found in the specified time period.")
 		return nil
