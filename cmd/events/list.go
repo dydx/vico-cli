@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/dydx/vico-cli/pkg/auth"
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/spf13/cobra"
 )
 
@@ -45,11 +43,6 @@ type Event struct {
 
 var hours int
 var outputFormat string
-var outputDestination string
-var influxURL string
-var influxOrg string
-var influxBucket string
-var influxToken string
 
 // listCmd represents the command to list events from the Vicohome API.
 // It allows users to fetch events from a specified number of hours in the past,
@@ -84,136 +77,39 @@ var listCmd = &cobra.Command{
 			return
 		}
 
-		// Display events based on output destination and format
+		// Display events
 		if len(events) == 0 {
 			fmt.Println("No events found in the specified time period.")
 			return
 		}
 
-		if outputDestination == "influxdb" {
-			// Write to InfluxDB
-			if err := writeToInfluxDB(events); err != nil {
-				fmt.Printf("Error writing to InfluxDB: %v\n", err)
+		// Write to stdout
+		if outputFormat == "json" {
+			// Output JSON format
+			prettyJSON, err := json.MarshalIndent(events, "", "  ")
+			if err != nil {
+				fmt.Printf("Error formatting JSON: %v\n", err)
 				return
 			}
+			fmt.Println(string(prettyJSON))
 		} else {
-			// Write to stdout
-			if outputFormat == "json" {
-				// Output JSON format
-				prettyJSON, err := json.MarshalIndent(events, "", "  ")
-				if err != nil {
-					fmt.Printf("Error formatting JSON: %v\n", err)
-					return
-				}
-				fmt.Println(string(prettyJSON))
-			} else {
-				// Output table format
+			// Output table format
+			fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
+				"Trace ID", "Timestamp", "Device Name", "Bird Name", "Bird Latin")
+			fmt.Println("--------------------------------------------------------------------------------------------------")
+			for _, event := range events {
 				fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
-					"Trace ID", "Timestamp", "Device Name", "Bird Name", "Bird Latin")
-				fmt.Println("--------------------------------------------------------------------------------------------------")
-				for _, event := range events {
-					fmt.Printf("%-36s %-20s %-25s %-25s %-25s\n",
-						event.TraceID,
-						event.Timestamp,
-						event.DeviceName,
-						event.BirdName,
-						event.BirdLatin)
-				}
+					event.TraceID,
+					event.Timestamp,
+					event.DeviceName,
+					event.BirdName,
+					event.BirdLatin)
 			}
 		}
 	},
 }
 
-// writeToInfluxDB writes events to InfluxDB
-func writeToInfluxDB(events []Event) error {
-	// Validate required configuration
-	if influxURL == "" {
-		return fmt.Errorf("InfluxDB URL is required")
-	}
-	if influxOrg == "" {
-		return fmt.Errorf("InfluxDB organization is required")
-	}
-	if influxBucket == "" {
-		return fmt.Errorf("InfluxDB bucket is required")
-	}
-	if influxToken == "" {
-		return fmt.Errorf("InfluxDB token is required")
-	}
 
-	fmt.Printf("Writing %d events to InfluxDB...\n", len(events))
-
-	// Create client
-	client := influxdb2.NewClient(influxURL, influxToken)
-	defer client.Close()
-
-	// Get write API
-	writeAPI := client.WriteAPI(influxOrg, influxBucket)
-
-	// Create error channel to capture async errors
-	errorsCh := writeAPI.Errors()
-
-	// Create a channel to signal completion of error handling
-	done := make(chan bool)
-
-	// Track if we've encountered any errors
-	var writeError error
-
-	// Start a goroutine to handle errors
-	go func() {
-		for err := range errorsCh {
-			if writeError == nil {
-				writeError = err
-			} else {
-				writeError = fmt.Errorf("%w; additional error: %v", writeError, err)
-			}
-		}
-		done <- true
-	}()
-
-	// Write all points
-	for _, event := range events {
-		// Parse timestamp
-		timestamp, err := parseTimestamp(event.Timestamp)
-		if err != nil {
-			fmt.Printf("Warning: Invalid timestamp '%s' for event with TraceID '%s': %v\n",
-				event.Timestamp, event.TraceID, err)
-			continue
-		}
-
-		// Create a point with measurement "bird_sighting"
-		point := influxdb2.NewPoint(
-			"bird_sighting",
-			map[string]string{
-				"device":     event.DeviceName,
-				"serial":     event.SerialNumber,
-				"bird_name":  event.BirdName,
-				"bird_latin": event.BirdLatin,
-				"trace_id":   event.TraceID,
-			},
-			map[string]interface{}{
-				"confidence": event.BirdConfidence,
-			},
-			timestamp,
-		)
-
-		// Write the point
-		writeAPI.WritePoint(point)
-	}
-
-	// Force writing of buffered points
-	writeAPI.Flush()
-
-	// Wait for any errors to be processed
-	<-done
-
-	// If no errors occurred, we're done
-	if writeError == nil {
-		fmt.Printf("Successfully wrote %d events to InfluxDB\n", len(events))
-		return nil
-	}
-
-	return fmt.Errorf("error writing to InfluxDB: %w", writeError)
-}
 
 // supportedTimeFormats contains the timestamp formats that the handler can parse
 var supportedTimeFormats = []string{
@@ -241,13 +137,6 @@ func parseTimestamp(timestamp string) (time.Time, error) {
 func init() {
 	listCmd.Flags().IntVar(&hours, "hours", 24, "Number of hours to fetch events for")
 	listCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
-
-	// Add flags for output destination and InfluxDB configuration
-	listCmd.Flags().StringVar(&outputDestination, "output", "stdout", "Output destination (stdout or influxdb)")
-	listCmd.Flags().StringVar(&influxURL, "influx-url", os.Getenv("INFLUX_URL"), "InfluxDB server URL")
-	listCmd.Flags().StringVar(&influxOrg, "influx-org", os.Getenv("INFLUX_ORG"), "InfluxDB organization")
-	listCmd.Flags().StringVar(&influxBucket, "influx-bucket", os.Getenv("INFLUX_BUCKET"), "InfluxDB bucket name")
-	listCmd.Flags().StringVar(&influxToken, "influx-token", os.Getenv("INFLUX_TOKEN"), "InfluxDB authentication token")
 }
 
 // fetchEvents retrieves events from the Vicohome API within the specified time range.
