@@ -109,8 +109,6 @@ var listCmd = &cobra.Command{
 	},
 }
 
-
-
 // supportedTimeFormats contains the timestamp formats that the handler can parse
 var supportedTimeFormats = []string{
 	"2006-01-02 15:04:05", // Standard format

@@ -23,8 +23,6 @@ func Factory(format string) (Handler, error) {
 	return NewStdoutHandler(format), nil
 }
 
-
-
 // NewStdoutHandler creates a new stdout output handler.
 func NewStdoutHandler(format string) Handler {
 	switch format {
@@ -34,5 +32,3 @@ func NewStdoutHandler(format string) Handler {
 		return stdout.NewTableHandler()
 	}
 }
-
-
