@@ -2,8 +2,6 @@
 package output
 
 import (
-	"fmt"
-
 	"github.com/dydx/vico-cli/pkg/models"
 	"github.com/dydx/vico-cli/pkg/output/stdout"
 )
