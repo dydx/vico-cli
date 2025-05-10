@@ -42,7 +42,13 @@ type LoginResponse struct {
 	} `json:"data"`
 }
 
-// Authenticate obtains an authentication token for the Vicohome API.
+// AuthenticateFunc is the function type for authentication to allow mocking in tests
+type AuthenticateFunc func() (string, error)
+
+// Authenticate is the main authentication function that can be replaced in tests
+var Authenticate AuthenticateFunc = authenticate
+
+// authenticate obtains an authentication token for the Vicohome API.
 // It first tries to retrieve a valid cached token. If no valid token is found,
 // it falls back to direct authentication using credentials from environment variables.
 // Successfully acquired tokens are cached for future use to minimize authentication requests.
@@ -50,7 +56,7 @@ type LoginResponse struct {
 // Returns:
 //   - string: The authentication token if successful
 //   - error: Any error encountered during the authentication process
-func Authenticate() (string, error) {
+func authenticate() (string, error) {
 	// Try to get a cached token first
 	cacheManager, err := cache.NewTokenCacheManager()
 	if err != nil {
@@ -224,8 +230,14 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
 
-	// Check if we need to refresh the token
-	needsRefresh, _ := ValidateResponse(respBody)
+	// Check if we need to refresh the token and if there are any errors
+	needsRefresh, validateErr := ValidateResponse(respBody)
+
+	// If there's an API error (not an auth error), return it immediately
+	if validateErr != nil && !needsRefresh {
+		return nil, validateErr
+	}
+
 	if needsRefresh {
 		// Clear the cache and get a new token
 		cacheManager, err := cache.NewTokenCacheManager()
@@ -257,6 +269,12 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 		respBody, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, fmt.Errorf("error reading response body after token refresh: %w", err)
+		}
+
+		// Validate the response again after refresh
+		_, validateErr = ValidateResponse(respBody)
+		if validateErr != nil {
+			return nil, validateErr
 		}
 	}
 
