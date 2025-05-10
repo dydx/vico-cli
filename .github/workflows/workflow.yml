@@ -39,8 +39,16 @@ jobs:
       - name: Build
         run: go build -o vico-cli main.go
 
-      - name: Run tests
-        run: go test ./...
+      - name: Run tests with coverage
+        run: |
+          go test -race -coverprofile=coverage.out -covermode=atomic ./...
+          go tool cover -func=coverage.out
+
+      - name: Generate coverage report
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.out
+          flags: unittests
 
   # Only run on push to main or release tags
   main-branch-workflow:
