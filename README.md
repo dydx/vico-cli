@@ -1,5 +1,7 @@
 # Vicohome CLI
 
+[![Code Coverage](https://codecov.io/gh/dydx/vico-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/dydx/vico-cli)
+
 A command-line interface tool for interacting with the Vicohome API to fetch and manage events.
 
 ## Features

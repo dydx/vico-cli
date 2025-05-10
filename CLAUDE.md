@@ -24,9 +24,28 @@ go test ./pkg/output/stdout
 # Run tests with verbose output
 go test -v ./...
 
-# Run tests with coverage
+# Run tests with coverage summary
 go test -cover ./...
+
+# Run tests with detailed coverage report
+go test -coverprofile=coverage.out ./...
+go tool cover -func=coverage.out
+
+# Generate HTML coverage report
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out -o coverage.html
+
+# Run tests with race condition detection
+go test -race ./...
+
+# Run all tests with coverage and race detection (as used in CI)
+go test -race -coverprofile=coverage.out -covermode=atomic ./...
 ```
+
+### Test Coverage Targets
+- Aim for at least 80% overall code coverage
+- Critical path functions should have 100% coverage
+- Focus on testing edge cases and error conditions
 
 ### Docker Development
 ```bash

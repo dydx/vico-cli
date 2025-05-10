@@ -56,15 +56,15 @@
   - [ ] Benchmark token caching operations
   - Priority: Low - Optimization targets
 
-- [TODO] Setup CI pipeline for testing (#9)
-  - [ ] Configure GitHub Actions for test automation
-  - [ ] Add test coverage reporting
-  - [ ] Implement linting checks
-  - [ ] Create test badges for README
-  - Priority: Medium - Ensures continuous quality
-
 ## Completed
 <!-- Tasks that are finished have DONE status -->
+
+- [DONE] Setup CI pipeline for testing (#9)
+  - [x] Configure GitHub Actions for test automation
+  - [x] Add test coverage reporting with Codecov integration
+  - [x] Implement linting checks
+  - [x] Create test badges for README
+  - Completed: 2023-05-09, CI workflow updated to run tests, report coverage, and display badges
 
 - [DONE] Complete token cache testing (#1)
   - [x] Test error cases in SaveToken (marshaling errors)
