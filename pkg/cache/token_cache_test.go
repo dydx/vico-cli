@@ -114,7 +114,7 @@ func TestTokenCache(t *testing.T) {
 				expectedTime := time.Now().Add(24 * time.Hour)
 				timeDiff := tc.ExpiresAt.Sub(expectedTime)
 				if timeDiff < -5*time.Second || timeDiff > 5*time.Second {
-					t.Errorf("Default expiration time %v not within 5 seconds of expected %v (24 hours)", 
+					t.Errorf("Default expiration time %v not within 5 seconds of expected %v (24 hours)",
 						tc.ExpiresAt, expectedTime)
 				}
 			},
@@ -134,12 +134,12 @@ func TestTokenCache(t *testing.T) {
 			checkResult: func(t *testing.T, manager *TokenCacheManager, err error) {
 				// Fix permissions to allow cleanup
 				os.Chmod(manager.CacheDir, 0700)
-				
+
 				// Verify we got an error
 				if err == nil {
 					t.Error("Expected error, got nil")
 				}
-				
+
 				// Verify the error is related to file writing
 				if err != nil && !errors.Is(err, os.ErrPermission) && !errors.Is(err, os.ErrNotExist) {
 					t.Logf("Got expected write error: %v", err)
@@ -156,12 +156,12 @@ func TestTokenCache(t *testing.T) {
 					Token:     testToken,
 					ExpiresAt: expires,
 				}
-				
+
 				data, err := json.Marshal(tc)
 				if err != nil {
 					t.Fatalf("Failed to marshal test token cache: %v", err)
 				}
-				
+
 				if err := os.WriteFile(manager.CacheFile, data, 0600); err != nil {
 					t.Fatalf("Failed to write test cache file: %v", err)
 				}
@@ -189,12 +189,12 @@ func TestTokenCache(t *testing.T) {
 					Token:     testToken,
 					ExpiresAt: expires,
 				}
-				
+
 				data, err := json.Marshal(tc)
 				if err != nil {
 					t.Fatalf("Failed to marshal test token cache: %v", err)
 				}
-				
+
 				if err := os.WriteFile(manager.CacheFile, data, 0600); err != nil {
 					t.Fatalf("Failed to write test cache file: %v", err)
 				}
@@ -219,7 +219,7 @@ func TestTokenCache(t *testing.T) {
 				if err := os.WriteFile(manager.CacheFile, []byte("test"), 0600); err != nil {
 					t.Fatalf("Failed to write test cache file: %v", err)
 				}
-				
+
 				// Change permissions to make it unreadable
 				if err := os.Chmod(manager.CacheFile, 0000); err != nil {
 					t.Fatalf("Failed to change file permissions: %v", err)
@@ -271,12 +271,12 @@ func TestTokenCache(t *testing.T) {
 					Token:     testToken,
 					ExpiresAt: time.Now().Add(1 * time.Hour),
 				}
-				
+
 				data, err := json.Marshal(tc)
 				if err != nil {
 					t.Fatalf("Failed to marshal test token cache: %v", err)
 				}
-				
+
 				if err := os.WriteFile(manager.CacheFile, data, 0600); err != nil {
 					t.Fatalf("Failed to write test cache file: %v", err)
 				}
@@ -320,7 +320,7 @@ func TestTokenCache(t *testing.T) {
 				if err := os.WriteFile(manager.CacheFile, []byte("test"), 0600); err != nil {
 					t.Fatalf("Failed to write test cache file: %v", err)
 				}
-				
+
 				// Make the parent directory read-only to prevent removal
 				if err := os.Chmod(manager.CacheDir, 0500); err != nil {
 					t.Fatalf("Failed to make directory read-only: %v", err)
@@ -333,12 +333,12 @@ func TestTokenCache(t *testing.T) {
 			checkResult: func(t *testing.T, manager *TokenCacheManager, err error) {
 				// Fix permissions to allow cleanup
 				os.Chmod(manager.CacheDir, 0700)
-				
+
 				// Verify we got an error
 				if err == nil {
 					t.Error("Expected error, got nil")
 				}
-				
+
 				// Verify the error is related to file removal
 				if err != nil && !errors.Is(err, os.ErrPermission) {
 					t.Logf("Got expected remove error: %v", err)
@@ -400,24 +400,24 @@ func TestNewTokenCacheManager(t *testing.T) {
 func TestNewTokenCacheManagerErrors(t *testing.T) {
 	// Save original home directory env var
 	origHome := os.Getenv("HOME")
-	
+
 	// Restore the original HOME environment variable after the test
 	defer func() {
 		os.Setenv("HOME", origHome)
 	}()
-	
+
 	// Test when home directory can't be determined
 	t.Run("HomeDirectoryError", func(t *testing.T) {
 		// Set HOME env var to empty to simulate error
 		os.Setenv("HOME", "")
-		
+
 		// Should fail now
 		_, err := NewTokenCacheManager()
 		if err == nil {
 			t.Error("Expected error when HOME is not set, got nil")
 		}
 	})
-	
+
 	// Test when directory can't be created
 	t.Run("DirectoryCreationError", func(t *testing.T) {
 		// Create a temp file (not directory) to prevent directory creation
@@ -427,10 +427,10 @@ func TestNewTokenCacheManagerErrors(t *testing.T) {
 		}
 		tempFile.Close()
 		defer os.Remove(tempFile.Name())
-		
+
 		// Set HOME to point to a temp file, which will cause MkdirAll to fail
 		os.Setenv("HOME", tempFile.Name())
-		
+
 		// Should fail now because can't create directory in a file
 		_, err = NewTokenCacheManager()
 		if err == nil {
@@ -447,12 +447,12 @@ func BenchmarkSaveToken(b *testing.B) {
 		b.Fatalf("Failed to create temp directory: %v", err)
 	}
 	defer os.RemoveAll(tempDir)
-	
+
 	manager := &TokenCacheManager{
 		CacheDir:  tempDir,
 		CacheFile: filepath.Join(tempDir, "auth.json"),
 	}
-	
+
 	// Benchmark
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -472,12 +472,12 @@ func BenchmarkGetToken(b *testing.B) {
 		b.Fatalf("Failed to create temp directory: %v", err)
 	}
 	defer os.RemoveAll(tempDir)
-	
+
 	manager := &TokenCacheManager{
 		CacheDir:  tempDir,
 		CacheFile: filepath.Join(tempDir, "auth.json"),
 	}
-	
+
 	// Create a valid token cache file for benchmark
 	token := "benchmark-token"
 	expiresAt := time.Now().Add(1 * time.Hour)
@@ -485,16 +485,16 @@ func BenchmarkGetToken(b *testing.B) {
 		Token:     token,
 		ExpiresAt: expiresAt,
 	}
-	
+
 	data, err := json.Marshal(tc)
 	if err != nil {
 		b.Fatalf("Failed to marshal test token cache: %v", err)
 	}
-	
+
 	if err := os.WriteFile(manager.CacheFile, data, 0600); err != nil {
 		b.Fatalf("Failed to write test cache file: %v", err)
 	}
-	
+
 	// Benchmark
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -512,12 +512,12 @@ func BenchmarkClearToken(b *testing.B) {
 		b.Fatalf("Failed to create temp directory: %v", err)
 	}
 	defer os.RemoveAll(tempDir)
-	
+
 	manager := &TokenCacheManager{
 		CacheDir:  tempDir,
 		CacheFile: filepath.Join(tempDir, "auth.json"),
 	}
-	
+
 	// Benchmark
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -525,7 +525,7 @@ func BenchmarkClearToken(b *testing.B) {
 		if err := os.WriteFile(manager.CacheFile, []byte("test"), 0600); err != nil {
 			b.Fatalf("Failed to write test cache file: %v", err)
 		}
-		
+
 		// Clear the token
 		err := manager.ClearToken()
 		if err != nil {

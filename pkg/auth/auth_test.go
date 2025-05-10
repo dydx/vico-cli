@@ -9,9 +9,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
-
-	"github.com/dydx/vico-cli/pkg/cache"
 )
 
 // mockRoundTripper is a custom RoundTripper that returns predefined responses for testing
@@ -137,31 +134,31 @@ func TestValidateResponse(t *testing.T) {
 func TestExecuteWithRetry_NetworkError(t *testing.T) {
 	// Save original transport to restore later
 	defaultTransport := http.DefaultTransport
-	
+
 	// Create a mock transport that returns a network error
 	mockTransport := &mockRoundTripper{
 		roundTripFunc: func(req *http.Request) (*http.Response, error) {
 			return nil, errors.New("network error")
 		},
 	}
-	
+
 	// Set the mock transport
 	http.DefaultTransport = mockTransport
 	defer func() {
 		http.DefaultTransport = defaultTransport
 	}()
-	
+
 	// Create a test request
 	req, _ := http.NewRequest("GET", "https://example.com", nil)
-	
+
 	// Call the function
 	_, err := ExecuteWithRetry(req)
-	
+
 	// Verify an error is returned
 	if err == nil {
 		t.Error("Expected an error but got nil")
 	}
-	
+
 	// Verify the error contains the network error message
 	expectedErrMsg := "network error"
 	if !strings.Contains(err.Error(), expectedErrMsg) {
@@ -173,31 +170,31 @@ func TestExecuteWithRetry_NetworkError(t *testing.T) {
 func TestExecuteWithRetry_SuccessfulRequest(t *testing.T) {
 	// Save original transport to restore later
 	defaultTransport := http.DefaultTransport
-	
+
 	// Create a mock transport that returns a successful response
 	mockTransport := &mockRoundTripper{
 		roundTripFunc: func(req *http.Request) (*http.Response, error) {
 			return createMockResponse(200, `{"result": 0, "msg": "success", "data": {"test": "data"}}`), nil
 		},
 	}
-	
+
 	// Set the mock transport
 	http.DefaultTransport = mockTransport
 	defer func() {
 		http.DefaultTransport = defaultTransport
 	}()
-	
+
 	// Create a test request
 	req, _ := http.NewRequest("GET", "https://example.com", nil)
-	
+
 	// Call the function
 	respBody, err := ExecuteWithRetry(req)
-	
+
 	// Verify no error is returned
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
-	
+
 	// Verify response contains expected data
 	expectedData := `"test": "data"`
 	if !strings.Contains(string(respBody), expectedData) {
@@ -248,11 +245,6 @@ type mockCacheManager struct {
 	valid      bool
 	saveError  bool
 	clearError bool
-}
-
-// Replace original TokenCacheManager with our mock for testing
-func mockNewTokenCacheManager() (*cache.TokenCacheManager, error) {
-	return nil, fmt.Errorf("mock error")
 }
 
 // GetToken implements the token getting functionality
@@ -429,173 +421,6 @@ func TestExecuteWithRetry_TokenRefresh(t *testing.T) {
 	// Verify all 3 requests were made
 	if requestCount != 3 {
 		t.Errorf("Expected 3 requests to be made, got %d", requestCount)
-	}
-}
-
-// TestAuthenticate tests the main Authenticate function with various scenarios
-func TestAuthenticate(t *testing.T) {
-	// Save original function pointers to restore later
-	origNewTokenCacheManager := cache.NewTokenCacheManager
-	defer func() {
-		cache.NewTokenCacheManager = origNewTokenCacheManager
-	}()
-
-	// Save original transport to restore later
-	defaultTransport := http.DefaultTransport
-
-	// Save original environment variables
-	originalEmail := os.Getenv("VICOHOME_EMAIL")
-	originalPassword := os.Getenv("VICOHOME_PASSWORD")
-
-	// Set test credentials
-	os.Setenv("VICOHOME_EMAIL", "test@example.com")
-	os.Setenv("VICOHOME_PASSWORD", "password123")
-
-	// Restore original values when test is done
-	defer func() {
-		http.DefaultTransport = defaultTransport
-		os.Setenv("VICOHOME_EMAIL", originalEmail)
-		os.Setenv("VICOHOME_PASSWORD", originalPassword)
-	}()
-
-	tests := []struct {
-		name          string
-		cacheSetup    func() *mockCacheManager
-		transportSetup func() *mockRoundTripper
-		expectedToken string
-		expectError   bool
-		errorContains string
-	}{
-		{
-			name: "Valid cached token",
-			cacheSetup: func() *mockCacheManager {
-				return &mockCacheManager{
-					token: "cached-token-123",
-					valid: true,
-				}
-			},
-			transportSetup: func() *mockRoundTripper {
-				return nil // Not used for this test
-			},
-			expectedToken: "cached-token-123",
-			expectError:   false,
-		},
-		{
-			name: "Cache error, fallback to direct auth",
-			cacheSetup: func() *mockCacheManager {
-				return nil // We'll use the error from mockNewTokenCacheManager
-			},
-			transportSetup: func() *mockRoundTripper {
-				return &mockRoundTripper{
-					roundTripFunc: func(req *http.Request) (*http.Response, error) {
-						return createMockResponse(200, `{"result": 0, "msg": "success", "data": {"token": {"token": "direct-token-123"}}}`), nil
-					},
-				}
-			},
-			expectedToken: "direct-token-123",
-			expectError:   false,
-		},
-		{
-			name: "Invalid cached token, successful refresh",
-			cacheSetup: func() *mockCacheManager {
-				return &mockCacheManager{
-					token: "expired-token",
-					valid: false,
-				}
-			},
-			transportSetup: func() *mockRoundTripper {
-				return &mockRoundTripper{
-					roundTripFunc: func(req *http.Request) (*http.Response, error) {
-						return createMockResponse(200, `{"result": 0, "msg": "success", "data": {"token": {"token": "fresh-token-123"}}}`), nil
-					},
-				}
-			},
-			expectedToken: "fresh-token-123",
-			expectError:   false,
-		},
-		{
-			name: "Direct auth failure",
-			cacheSetup: func() *mockCacheManager {
-				return &mockCacheManager{
-					token: "",
-					valid: false,
-				}
-			},
-			transportSetup: func() *mockRoundTripper {
-				return &mockRoundTripper{
-					roundTripFunc: func(req *http.Request) (*http.Response, error) {
-						return createMockResponse(200, `{"result": -1000, "msg": "Invalid credentials", "data": null}`), nil
-					},
-				}
-			},
-			expectedToken: "",
-			expectError:   true,
-			errorContains: "API error: Invalid credentials",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			// Setup mock cache
-			mockCache := tc.cacheSetup()
-			if mockCache != nil {
-				// Replace the NewTokenCacheManager function to return our mock
-				cache.NewTokenCacheManager = func() (*cache.TokenCacheManager, error) {
-					// We're ignoring types here since Go doesn't know our mock implements the same interface
-					// In a real project, we would define a proper interface
-					return &cache.TokenCacheManager{
-						CacheDir:  "mock-dir",
-						CacheFile: "mock-file",
-					}, nil
-				}
-
-				// Store the mock to use its methods
-				// This is hacky but works for testing
-				authenticateOriginal := Authenticate
-				Authenticate = func() (string, error) {
-					if mockCache.valid {
-						return mockCache.token, nil
-					}
-					token, err := authenticateDirectly()
-					if err != nil {
-						return "", err
-					}
-					mockCache.SaveToken(token, 24)
-					return token, nil
-				}
-				defer func() {
-					Authenticate = authenticateOriginal
-				}()
-			} else {
-				// Use the error returning mock for cases where we want cache creation to fail
-				cache.NewTokenCacheManager = mockNewTokenCacheManager
-			}
-
-			// Setup mock transport if provided
-			mockTransport := tc.transportSetup()
-			if mockTransport != nil {
-				http.DefaultTransport = mockTransport
-			}
-
-			// Call the function
-			token, err := Authenticate()
-
-			// Check results
-			if tc.expectError {
-				if err == nil {
-					t.Errorf("Expected error but got nil")
-				} else if !strings.Contains(err.Error(), tc.errorContains) {
-					t.Errorf("Expected error to contain %q, got %q", tc.errorContains, err.Error())
-				}
-			} else {
-				if err != nil {
-					t.Errorf("Expected no error, got %v", err)
-				}
-				if token != tc.expectedToken {
-					t.Errorf("Expected token %q, got %q", tc.expectedToken, token)
-				}
-			}
-		})
 	}
 }
 

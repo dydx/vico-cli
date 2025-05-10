@@ -69,11 +69,11 @@ func TestHandlerWrite(t *testing.T) {
 
 	// Define test cases
 	tests := []struct {
-		name                 string
-		handler              interface{} // Either *JSONHandler or *TableHandler
-		events               []models.Event
-		expectError          bool
-		validateOutput       func(t *testing.T, output string, events []models.Event)
+		name           string
+		handler        interface{} // Either *JSONHandler or *TableHandler
+		events         []models.Event
+		expectError    bool
+		validateOutput func(t *testing.T, output string, events []models.Event)
 	}{
 		{
 			name:        "JSONHandler with single event",
@@ -125,7 +125,7 @@ func TestHandlerWrite(t *testing.T) {
 				if capturedEvents[0].TraceID != events[0].TraceID {
 					t.Errorf("First event TraceID expected '%s', got '%s'", events[0].TraceID, capturedEvents[0].TraceID)
 				}
-				
+
 				if capturedEvents[1].BirdName != events[1].BirdName {
 					t.Errorf("Second event BirdName expected '%s', got '%s'", events[1].BirdName, capturedEvents[1].BirdName)
 				}
@@ -145,7 +145,7 @@ func TestHandlerWrite(t *testing.T) {
 				// Verify output contains event data
 				for _, event := range events {
 					if !strings.Contains(output, event.TraceID) || !strings.Contains(output, event.BirdName) {
-						t.Errorf("Event data not found in output: TraceID=%s, BirdName=%s", 
+						t.Errorf("Event data not found in output: TraceID=%s, BirdName=%s",
 							event.TraceID, event.BirdName)
 					}
 				}
@@ -171,7 +171,7 @@ func TestHandlerWrite(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			var err error
 			var output string
-			
+
 			// Type switch to call the appropriate handler
 			switch h := tc.handler.(type) {
 			case *JSONHandler:
