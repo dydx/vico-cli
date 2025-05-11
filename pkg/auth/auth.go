@@ -12,15 +12,31 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/dydx/vico-cli/pkg/cache"
 )
 
 // Error codes from the API
 const (
-	ErrorAccountKicked = -1024
-	ErrorTokenMissing  = -1025
+	ErrorAccountKicked = -1024  // Account has been kicked offline
+	ErrorTokenMissing  = -1025  // Token is missing
+	ErrorTokenInvalid  = -1026  // Token is invalid
+	ErrorTokenExpired  = -1027  // Token has expired
 )
+
+// isDebugMode returns true if debug logging is enabled
+func isDebugMode() bool {
+	debug := os.Getenv("VICOHOME_DEBUG")
+	return debug == "true" || debug == "1"
+}
+
+// logDebug prints a message only if debug mode is enabled
+func logDebug(format string, args ...interface{}) {
+	if isDebugMode() {
+		fmt.Fprintf(os.Stderr, format, args...)
+	}
+}
 
 // LoginRequest represents the JSON request body sent to the Vicohome API
 // during authentication.
@@ -55,16 +71,19 @@ func Authenticate() (string, error) {
 	cacheManager, err := cache.NewTokenCacheManager()
 	if err != nil {
 		// If we can't create a cache manager, fall back to direct authentication
+		logDebug("Warning: Could not create token cache manager: %v\n", err)
 		return authenticateDirectly()
 	}
 
 	token, valid := cacheManager.GetToken()
 	if valid {
+		logDebug("Using cached token\n")
 		// We have a valid cached token, return it
 		return token, nil
 	}
 
 	// No valid cached token, authenticate and cache the new token
+	logDebug("No valid cached token found, authenticating directly\n")
 	token, err = authenticateDirectly()
 	if err != nil {
 		return "", err
@@ -73,7 +92,9 @@ func Authenticate() (string, error) {
 	// Cache the token for future use (24 hours validity)
 	if err := cacheManager.SaveToken(token, 24); err != nil {
 		// Non-fatal error, we can still return the token
-		fmt.Fprintf(os.Stderr, "Warning: failed to cache token: %v\n", err)
+		logDebug("Warning: failed to cache token: %v\n", err)
+	} else {
+		logDebug("Successfully cached new token\n")
 	}
 
 	return token, nil
@@ -170,30 +191,80 @@ func authenticateDirectly() (string, error) {
 //   - bool: True if the token needs to be refreshed, false otherwise
 //   - error: Any error found in the response, or nil if no error was found
 func ValidateResponse(respBody []byte) (bool, error) {
+	// Check if we have a non-JSON response (probably HTML error page)
+	if len(respBody) > 0 && (respBody[0] == '<' || respBody[0] == '\r' || respBody[0] == '\n') {
+		// Print a preview for debugging
+		if isDebugMode() {
+			preview := string(respBody)
+			if len(preview) > 100 {
+				preview = preview[:100] + "..."
+			}
+			logDebug("Warning: Received non-JSON response (likely auth issue): %s\n", preview)
+		}
+		return true, fmt.Errorf("received non-JSON response (likely authentication issue)")
+	}
+
 	// Try to parse the response
 	var responseMap map[string]interface{}
 	if err := json.Unmarshal(respBody, &responseMap); err != nil {
 		return false, fmt.Errorf("error unmarshaling response: %w", err)
 	}
 
-	// Check for authentication errors
+	// Print the response for debugging
+	if isDebugMode() {
+		prettyJSON, _ := json.MarshalIndent(responseMap, "", "  ")
+		logDebug("API Response: %s\n", string(prettyJSON))
+	}
+
+	// Check for authentication errors - try both result and code fields (API inconsistency)
+	var errorCode float64
+	var errorMsg string
+	var hasError bool
+
+	// Check the "result" field first (main API)
 	if result, ok := responseMap["result"].(float64); ok {
+		errorCode = result
 		msg, _ := responseMap["msg"].(string)
+		errorMsg = msg
+		hasError = result != 0
+	}
 
-		// Check if we need to refresh the token
-		if result == ErrorAccountKicked || result == ErrorTokenMissing {
-			// Clear the cache
-			cacheManager, err := cache.NewTokenCacheManager()
-			if err == nil {
-				cacheManager.ClearToken()
+	// Also check the "code" field (some endpoints use this instead)
+	if code, ok := responseMap["code"].(float64); ok {
+		errorCode = code
+		msg, _ := responseMap["msg"].(string)
+		errorMsg = msg
+		hasError = code != 0
+	}
+
+	// If we found an error code
+	if hasError {
+		// Check if it's an auth error requiring token refresh
+		isAuthError := errorCode == ErrorAccountKicked || 
+			errorCode == ErrorTokenMissing || 
+			errorCode == ErrorTokenInvalid || 
+			errorCode == ErrorTokenExpired
+
+		// Also check message strings for auth-related errors
+		if !isAuthError && errorMsg != "" {
+			errorMsgLower := strings.ToLower(errorMsg)
+			isAuthError = strings.Contains(errorMsgLower, "token") ||
+				strings.Contains(errorMsgLower, "auth") ||
+				strings.Contains(errorMsgLower, "login") ||
+				strings.Contains(errorMsgLower, "账号") || // account in Chinese
+				strings.Contains(errorMsgLower, "踢下线") // kicked offline in Chinese
+		}
+
+		if isAuthError {
+			if isDebugMode() {
+				logDebug("Auth error detected: %s (code: %.0f)\n", errorMsg, errorCode)
 			}
-			return true, fmt.Errorf("authentication error: %s (code: %.0f)", msg, result)
+			// Don't clear cache here, let the caller handle it
+			return true, fmt.Errorf("authentication error: %s (code: %.0f)", errorMsg, errorCode)
 		}
 
-		// Check for other API errors
-		if result != 0 {
-			return false, fmt.Errorf("API error: %s (code: %.0f)", msg, result)
-		}
+		// Otherwise it's a regular API error
+		return false, fmt.Errorf("API error: %s (code: %.0f)", errorMsg, errorCode)
 	}
 
 	return false, nil
@@ -213,6 +284,19 @@ func ValidateResponse(respBody []byte) (bool, error) {
 func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 	// First attempt with current token
 	client := &http.Client{}
+
+	// Make sure we can reuse the request body if needed
+	var requestBodyBytes []byte
+	if req.Body != nil {
+		var err error
+		requestBodyBytes, err = io.ReadAll(req.Body)
+		if err != nil {
+			return nil, fmt.Errorf("error reading request body: %w", err)
+		}
+		req.Body = io.NopCloser(bytes.NewBuffer(requestBodyBytes))
+	}
+
+	// First attempt
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making request: %w", err)
@@ -225,30 +309,57 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 	}
 
 	// Check if we need to refresh the token
-	needsRefresh, _ := ValidateResponse(respBody)
+	needsRefresh, apiErr := ValidateResponse(respBody)
 	if needsRefresh {
+		// Only show detailed logs in debug mode
+		logDebug("Token refresh needed: %v\n", apiErr)
+		
 		// Clear the cache and get a new token
 		cacheManager, err := cache.NewTokenCacheManager()
 		if err == nil {
 			cacheManager.ClearToken()
 		}
 
-		// Get a new token
+		// Get a new token directly (bypass cache)
 		token, err := authenticateDirectly()
 		if err != nil {
 			return nil, fmt.Errorf("failed to refresh token: %w", err)
 		}
 
-		// Cache the new token
+		// Cache the new token with verbose error handling
 		if cacheManager != nil {
-			cacheManager.SaveToken(token, 24)
+			if err := cacheManager.SaveToken(token, 24); err != nil {
+				logDebug("Warning: failed to cache refreshed token: %v\n", err)
+			} else {
+				logDebug("Successfully refreshed and cached new token\n")
+			}
 		}
 
-		// Update the request with the new token
-		req.Header.Set("Authorization", token)
+		// Create a new request with the same parameters but new token
+		newReq, err := http.NewRequest(req.Method, req.URL.String(), nil)
+		if err != nil {
+			return nil, fmt.Errorf("error creating request for retry: %w", err)
+		}
 
-		// Retry the request
-		resp, err = client.Do(req)
+		// Copy all headers from the original request
+		for key, values := range req.Header {
+			for _, value := range values {
+				newReq.Header.Add(key, value)
+			}
+		}
+
+		// Set the new Authorization header
+		newReq.Header.Set("Authorization", token)
+
+		// Add back the body if there was one
+		if len(requestBodyBytes) > 0 {
+			newReq.Body = io.NopCloser(bytes.NewBuffer(requestBodyBytes))
+			newReq.ContentLength = int64(len(requestBodyBytes))
+		}
+
+		// Retry the request with the new token
+		logDebug("Retrying request with refreshed token\n")
+		resp, err = client.Do(newReq)
 		if err != nil {
 			return nil, fmt.Errorf("error making request after token refresh: %w", err)
 		}
@@ -257,6 +368,13 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 		respBody, err = io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, fmt.Errorf("error reading response body after token refresh: %w", err)
+		}
+		
+		// Check if we still got an error after refreshing the token
+		needsRefresh2, apiError := ValidateResponse(respBody)
+		if needsRefresh2 || apiError != nil {
+			// This is a critical error worth showing - authentication failed even after token refresh
+			return nil, fmt.Errorf("authentication failed even after token refresh: %v", apiError)
 		}
 	}
 
