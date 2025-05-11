@@ -19,10 +19,10 @@ import (
 
 // Error codes from the API
 const (
-	ErrorAccountKicked = -1024  // Account has been kicked offline
-	ErrorTokenMissing  = -1025  // Token is missing
-	ErrorTokenInvalid  = -1026  // Token is invalid
-	ErrorTokenExpired  = -1027  // Token has expired
+	ErrorAccountKicked = -1024 // Account has been kicked offline
+	ErrorTokenMissing  = -1025 // Token is missing
+	ErrorTokenInvalid  = -1026 // Token is invalid
+	ErrorTokenExpired  = -1027 // Token has expired
 )
 
 // isDebugMode returns true if debug logging is enabled
@@ -240,9 +240,9 @@ func ValidateResponse(respBody []byte) (bool, error) {
 	// If we found an error code
 	if hasError {
 		// Check if it's an auth error requiring token refresh
-		isAuthError := errorCode == ErrorAccountKicked || 
-			errorCode == ErrorTokenMissing || 
-			errorCode == ErrorTokenInvalid || 
+		isAuthError := errorCode == ErrorAccountKicked ||
+			errorCode == ErrorTokenMissing ||
+			errorCode == ErrorTokenInvalid ||
 			errorCode == ErrorTokenExpired
 
 		// Also check message strings for auth-related errors
@@ -313,7 +313,7 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 	if needsRefresh {
 		// Only show detailed logs in debug mode
 		logDebug("Token refresh needed: %v\n", apiErr)
-		
+
 		// Clear the cache and get a new token
 		cacheManager, err := cache.NewTokenCacheManager()
 		if err == nil {
@@ -369,7 +369,7 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error reading response body after token refresh: %w", err)
 		}
-		
+
 		// Check if we still got an error after refreshing the token
 		needsRefresh2, apiError := ValidateResponse(respBody)
 		if needsRefresh2 || apiError != nil {
