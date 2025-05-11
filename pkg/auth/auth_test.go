@@ -11,6 +11,24 @@ import (
 	"testing"
 )
 
+
+// MockExecuteWithRetry sets up the global ExecuteWithRetry function to return a static response.
+// Returns a cleanup function to restore the original function.
+func MockExecuteWithRetry(response []byte, err error) func() {
+	// Save the original implementation
+	oldExecuteWithRetry := ExecuteWithRetry
+
+	// Replace with mock implementation
+	ExecuteWithRetry = func(req *http.Request) ([]byte, error) {
+		return response, err
+	}
+
+	// Return a cleanup function
+	return func() {
+		ExecuteWithRetry = oldExecuteWithRetry
+	}
+}
+
 // mockRoundTripper is a custom RoundTripper that returns predefined responses for testing
 type mockRoundTripper struct {
 	roundTripFunc func(req *http.Request) (*http.Response, error)

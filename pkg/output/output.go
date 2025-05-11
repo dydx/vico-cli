@@ -2,6 +2,8 @@
 package output
 
 import (
+	"strings"
+
 	"github.com/dydx/vico-cli/pkg/models"
 	"github.com/dydx/vico-cli/pkg/output/stdout"
 )
@@ -23,7 +25,8 @@ func Factory(format string) (Handler, error) {
 
 // NewStdoutHandler creates a new stdout output handler.
 func NewStdoutHandler(format string) Handler {
-	switch format {
+	// Convert format to lowercase for case-insensitive matching
+	switch strings.ToLower(format) {
 	case "json":
 		return stdout.NewJSONHandler()
 	default:

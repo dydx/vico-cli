@@ -149,3 +149,9 @@ The Vicohome CLI is a command-line tool for interacting with the Vicohome API, p
 # PRIORITIES
 
 Your top priority right now is properly and thoroughly executing on the plans in @TESTING_PROJECT_TASKS.md
+
+1. First, focus on making command functions mockable as described in TODO.md
+2. Then, fix the skipped tests in the command packages
+3. Finally, improve test coverage in low-coverage areas
+
+Check TESTING_SUMMARY.md for an overview of current test coverage and next steps.

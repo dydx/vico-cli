@@ -48,6 +48,25 @@ type AuthenticateFunc func() (string, error)
 // Authenticate is the main authentication function that can be replaced in tests
 var Authenticate AuthenticateFunc = authenticate
 
+// HTTPClient is the client used for API requests, which can be replaced in tests
+var HTTPClient *http.Client = &http.Client{}
+
+// MockAuthenticate sets up the global Authenticate function to return a static token and error.
+// Returns a cleanup function to restore the original function.
+func MockAuthenticate(token string, err error) func() {
+	original := Authenticate
+
+	mockFunc := func() (string, error) {
+		return token, err
+	}
+
+	Authenticate = mockFunc
+
+	return func() {
+		Authenticate = original
+	}
+}
+
 // authenticate obtains an authentication token for the Vicohome API.
 // It first tries to retrieve a valid cached token. If no valid token is found,
 // it falls back to direct authentication using credentials from environment variables.
@@ -121,8 +140,7 @@ func authenticateDirectly() (string, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := HTTPClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("error making request: %w", err)
 	}
@@ -164,7 +182,24 @@ func authenticateDirectly() (string, error) {
 	return tokenStr, nil
 }
 
-// ValidateResponse checks if an API response contains an authentication error
+// APIError represents an error from the Vicohome API.
+type APIError struct {
+	Code    string
+	Message string
+}
+
+// Error implements the error interface for APIError.
+func (e *APIError) Error() string {
+	return e.Message
+}
+
+// ValidateResponseFunc is a function type for the ValidateResponse function
+type ValidateResponseFunc func(respBody []byte) (bool, error)
+
+// ValidateResponse is the implementation of ValidateResponseFunc that can be replaced in tests
+var ValidateResponse ValidateResponseFunc = validateResponse
+
+// validateResponse checks if an API response contains an authentication error
 // and determines if the token needs to be refreshed. It analyzes the response body
 // for specific error codes that indicate authentication issues. If such an error
 // is found, it clears the token cache to force a new authentication.
@@ -175,7 +210,7 @@ func authenticateDirectly() (string, error) {
 // Returns:
 //   - bool: True if the token needs to be refreshed, false otherwise
 //   - error: Any error found in the response, or nil if no error was found
-func ValidateResponse(respBody []byte) (bool, error) {
+func validateResponse(respBody []byte) (bool, error) {
 	// Try to parse the response
 	var responseMap map[string]interface{}
 	if err := json.Unmarshal(respBody, &responseMap); err != nil {
@@ -205,7 +240,13 @@ func ValidateResponse(respBody []byte) (bool, error) {
 	return false, nil
 }
 
-// ExecuteWithRetry executes an HTTP request with automatic token refresh on authentication errors.
+// ExecuteWithRetryFunc is a function type for the ExecuteWithRetry function
+type ExecuteWithRetryFunc func(req *http.Request) ([]byte, error)
+
+// ExecuteWithRetry is the implementation of ExecuteWithRetryFunc that can be replaced in tests
+var ExecuteWithRetry ExecuteWithRetryFunc = executeWithRetry
+
+// executeWithRetry executes an HTTP request with automatic token refresh on authentication errors.
 // If the initial request fails due to an authentication error, it refreshes the token and
 // retries the request once with the new token. This handles cases where a token has expired
 // or been invalidated since it was cached.
@@ -216,10 +257,9 @@ func ValidateResponse(respBody []byte) (bool, error) {
 // Returns:
 //   - []byte: The response body if successful
 //   - error: Any error encountered during the request process
-func ExecuteWithRetry(req *http.Request) ([]byte, error) {
+func executeWithRetry(req *http.Request) ([]byte, error) {
 	// First attempt with current token
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := HTTPClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making request: %w", err)
 	}
@@ -231,7 +271,7 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 	}
 
 	// Check if we need to refresh the token and if there are any errors
-	needsRefresh, validateErr := ValidateResponse(respBody)
+	needsRefresh, validateErr := validateResponse(respBody)
 
 	// If there's an API error (not an auth error), return it immediately
 	if validateErr != nil && !needsRefresh {
@@ -260,7 +300,7 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 		req.Header.Set("Authorization", token)
 
 		// Retry the request
-		resp, err = client.Do(req)
+		resp, err = HTTPClient.Do(req)
 		if err != nil {
 			return nil, fmt.Errorf("error making request after token refresh: %w", err)
 		}
@@ -272,7 +312,7 @@ func ExecuteWithRetry(req *http.Request) ([]byte, error) {
 		}
 
 		// Validate the response again after refresh
-		_, validateErr = ValidateResponse(respBody)
+		_, validateErr = validateResponse(respBody)
 		if validateErr != nil {
 			return nil, validateErr
 		}
