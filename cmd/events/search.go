@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	searchField string
-	searchTerm  string
+	searchField     string
+	searchTerm      string
 	searchStartTime string
 	searchEndTime   string
 )
@@ -23,7 +23,7 @@ var (
 var searchCmd = &cobra.Command{
 	Use:   "search",
 	Short: "Search events by field value",
-	Long:  `Search for events that match a specific field value within a specified time range.
+	Long: `Search for events that match a specific field value within a specified time range.
 Times should be in format: 2025-05-18 14:59:25`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if searchField == "" {
@@ -109,7 +109,6 @@ Times should be in format: 2025-05-18 14:59:25`,
 		}
 	},
 }
-
 
 func init() {
 	currentTime := time.Now()

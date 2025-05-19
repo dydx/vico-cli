@@ -42,8 +42,8 @@ type Event struct {
 }
 
 var (
-	startTime string
-	endTime   string
+	startTime    string
+	endTime      string
 	outputFormat string
 )
 
@@ -53,7 +53,7 @@ var (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List events within a specified time range",
-	Long:  `Fetch and display events from Vicohome API for the specified time period. 
+	Long: `Fetch and display events from Vicohome API for the specified time period. 
 Times should be in format: 2025-05-18 14:59:25`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Parse and validate time parameters
@@ -140,12 +140,11 @@ func parseTimestamp(timestamp string) (time.Time, error) {
 	return time.Time{}, lastErr
 }
 
-
 func init() {
 	currentTime := time.Now()
 	defaultStart := currentTime.Add(-24 * time.Hour).Format("2006-01-02 15:04:05")
 	defaultEnd := currentTime.Format("2006-01-02 15:04:05")
-	
+
 	listCmd.Flags().StringVar(&startTime, "startTime", defaultStart, "Start time (format: 2006-01-02 15:04:05)")
 	listCmd.Flags().StringVar(&endTime, "endTime", defaultEnd, "End time (format: 2006-01-02 15:04:05)")
 	listCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
