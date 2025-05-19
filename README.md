@@ -76,16 +76,24 @@ Get details for a specific device:
 
 ### Events
 
-List recent events:
+List recent events (defaults to last 24 hours):
 
 ```bash
 ./vicohome events list
 ```
 
-List events for a specific time period:
+List events for a specific time range:
 
 ```bash
-./vicohome events list --hours 1
+./vicohome events list --startTime "2025-05-18 14:00:00" --endTime "2025-05-18 19:00:00"
+```
+
+Search for events by field within a time range:
+
+```bash
+./vicohome events search --field birdName "Northern Cardinal" --startTime "2025-05-17 00:00:00" --endTime "2025-05-18 00:00:00"
+./vicohome events search --field serialNumber [serialNumber] --startTime "2025-05-18 10:00:00" --endTime "2025-05-18 15:00:00"
+./vicohome events search --field deviceName "Birdies" --startTime "2025-05-18 12:00:00" --endTime "2025-05-18 18:00:00"
 ```
 
 Get details for a specific event:

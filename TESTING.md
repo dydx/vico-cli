@@ -66,25 +66,25 @@ Serial Number                        Model                Name                 N
 ### `./vico-cli events list` [PASS]
 
 ```bash
-➜  vicohome git:(main) ✗ ./vico-cli events list --hours 2
+➜  vicohome git:(main) ✗ ./vico-cli events list --startTime "2025-05-17 18:00:00" --endTime "2025-05-17 20:00:00"
 Trace ID                             Timestamp            Device Name               Bird Name                 Bird Latin               
 --------------------------------------------------------------------------------------------------
 018594221744243886k4jua3TyFQq        2025-04-09 20:11:24  Birdies                   Eastern Phoebe            Sayornis phoebe 
 ```
 
-### `./vico-cli events list --hours 2` [PASS]
+### `./vico-cli events list --startTime <> --endTime <>` [PASS]
 
 ```bash
-➜  vicohome git:(main) ✗ ./vico-cli events list --hours 2
+➜  vicohome git:(main) ✗ ./vico-cli events list --startTime "2025-05-17 18:00:00" --endTime "2025-05-17 20:00:00"
 Trace ID                             Timestamp            Device Name               Bird Name                 Bird Latin               
 --------------------------------------------------------------------------------------------------
 018594221744243886k4jua3TyFQq        2025-04-09 20:11:24  Birdies                   Eastern Phoebe            Sayornis phoebe 
 ```
 
-### `./vico-cli events list --hours 1 --format json` [PASS]
+### `./vico-cli events list --startTime <> --endTime <> --format json` [PASS]
 
 ```bash
-➜  vicohome git:(main) ✗ ./vico-cli events list --hours 2 --format json
+➜  vicohome git:(main) ✗ ./vico-cli events list --startTime "2025-05-17 18:00:00" --endTime "2025-05-17 20:00:00" --format json
 [
   {
     "traceId": "018594221744243886k4jua3TyFQq",
@@ -144,10 +144,10 @@ Video URL:      https://api-us.vicohome.io/video/download/m3u8/01859422174424388
 
 ## Events Search
 
-### `./vico-cli events search --field serialNumber <>` [PASS]
+### `./vico-cli events search --field serialNumber <> --startTime <> --endTime <>` [PASS]
 
 ```bash
-➜  vicohome git:(main) ✗ ./vico-cli events search --field serialNumber 378b660598295ceca8b20871991a0409
+➜  vicohome git:(main) ✗ ./vico-cli events search --field serialNumber 378b660598295ceca8b20871991a0409 --startTime "2025-05-17 13:00:00" --endTime "2025-05-17 15:00:00"
 Trace ID                             Timestamp            Device Name               Bird Name                 Bird Latin               
 --------------------------------------------------------------------------------------------------
 018594221744308360Sr56DmocjwP        2025-04-10 14:05:58  Birdies                   Eastern Bluebird          Sialia sialis            
@@ -162,19 +162,19 @@ Trace ID                             Timestamp            Device Name           
 018594221744303514zXrR13t7xpl        2025-04-10 12:45:12  Birdies                   House Finch               Haemorhous mexicanus
 ```
 
-### `./vico-cli events search --field birdName <>` [PASS]
+### `./vico-cli events search --field birdName <> --startTime <> --endTime <>` [PASS]
 
 ```bash
-➜  vicohome git:(main) ✗ ./vico-cli events search --field birdName "Eastern Phoebe"
+➜  vicohome git:(main) ✗ ./vico-cli events search --field birdName "Eastern Phoebe" --startTime "2025-05-17 00:00:00" --endTime "2025-05-18 00:00:00"
 Trace ID                             Timestamp            Device Name               Bird Name                 Bird Latin               
 --------------------------------------------------------------------------------------------------
 018594221744243886k4jua3TyFQq        2025-04-09 20:11:24  Birdies                   Eastern Phoebe            Sayornis phoebe
 ```
 
-### `./vico-cli events search --field birdName <> --format json` [PASS]
+### `./vico-cli events search --field birdName <> --startTime <> --endTime <> --format json` [PASS]
 
 ```bash
-➜  vicohome git:(main) ✗ ./vico-cli events search --field birdName "Eastern Phoebe" --format json
+➜  vicohome git:(main) ✗ ./vico-cli events search --field birdName "Eastern Phoebe" --startTime "2025-05-17 00:00:00" --endTime "2025-05-18 00:00:00" --format json
 [
   {
     "traceId": "018594221744243886k4jua3TyFQq",
@@ -193,10 +193,10 @@ Trace ID                             Timestamp            Device Name           
 ]
 ```
 
-### `./vico-cli events search --field deviceName <>` [PASS]
+### `./vico-cli events search --field deviceName <> --startTime <> --endTime <>` [PASS]
 
 ```bash
-➜  vicohome git:(main) ✗ ./vico-cli events search --field deviceName "Birdies"
+➜  vicohome git:(main) ✗ ./vico-cli events search --field deviceName "Birdies" --startTime "2025-05-17 12:00:00" --endTime "2025-05-17 15:00:00"
 Trace ID                             Timestamp            Device Name               Bird Name                 Bird Latin               
 --------------------------------------------------------------------------------------------------
 018594221744308360Sr56DmocjwP        2025-04-10 14:05:58  Birdies                   Eastern Bluebird          Sialia sialis            

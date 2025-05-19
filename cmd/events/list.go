@@ -41,25 +41,33 @@ type Event struct {
 	keyshots []map[string]interface{} `json:"-"`
 }
 
-var hours int
-var outputFormat string
+var (
+	startTime    string
+	endTime      string
+	outputFormat string
+)
 
 // listCmd represents the command to list events from the Vicohome API.
-// It allows users to fetch events from a specified number of hours in the past,
+// It allows users to fetch events within a specified time range,
 // and supports output in both table and JSON formats.
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List events from the last N hours",
-	Long:  `Fetch and display events from Vicohome API for the specified time period.`,
+	Short: "List events within a specified time range",
+	Long: `Fetch and display events from Vicohome API for the specified time period. 
+Times should be in format: 2025-05-18 14:59:25`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Parse and validate time parameters
+		start, end, err := parseTimeParameters(startTime, endTime)
+		if err != nil {
+			fmt.Printf("Error parsing time parameters: %v\n", err)
+			return
+		}
+
 		token, err := auth.Authenticate()
 		if err != nil {
 			fmt.Printf("Authentication failed: %v\n", err)
 			return
 		}
-
-		end := time.Now()
-		start := end.Add(-time.Duration(hours) * time.Hour)
 
 		startTimestamp := fmt.Sprintf("%d", start.Unix())
 		endTimestamp := fmt.Sprintf("%d", end.Unix())
@@ -133,7 +141,12 @@ func parseTimestamp(timestamp string) (time.Time, error) {
 }
 
 func init() {
-	listCmd.Flags().IntVar(&hours, "hours", 24, "Number of hours to fetch events for")
+	currentTime := time.Now()
+	defaultStart := currentTime.Add(-24 * time.Hour).Format("2006-01-02 15:04:05")
+	defaultEnd := currentTime.Format("2006-01-02 15:04:05")
+
+	listCmd.Flags().StringVar(&startTime, "startTime", defaultStart, "Start time (format: 2006-01-02 15:04:05)")
+	listCmd.Flags().StringVar(&endTime, "endTime", defaultEnd, "End time (format: 2006-01-02 15:04:05)")
 	listCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
 }
 
