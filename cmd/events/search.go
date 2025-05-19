@@ -13,7 +13,8 @@ import (
 var (
 	searchField string
 	searchTerm  string
-	searchHours int
+	searchStartTime string
+	searchEndTime   string
 )
 
 // searchCmd represents the command to search for events that match specific criteria.
@@ -22,7 +23,8 @@ var (
 var searchCmd = &cobra.Command{
 	Use:   "search",
 	Short: "Search events by field value",
-	Long:  `Search for events that match a specific field value.`,
+	Long:  `Search for events that match a specific field value within a specified time range.
+Times should be in format: 2025-05-18 14:59:25`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if searchField == "" {
 			fmt.Println("Error: --field flag is required")
@@ -40,15 +42,18 @@ var searchCmd = &cobra.Command{
 			return
 		}
 
+		// Parse and validate time parameters
+		start, end, err := parseTimeParameters(searchStartTime, searchEndTime)
+		if err != nil {
+			fmt.Printf("Error parsing time parameters: %v\n", err)
+			return
+		}
+
 		token, err := auth.Authenticate()
 		if err != nil {
 			fmt.Printf("Authentication failed: %v\n", err)
 			return
 		}
-
-		// Use the same logic as list command to get events from the last searchHours
-		end := time.Now()
-		start := end.Add(-time.Duration(searchHours) * time.Hour)
 
 		startTimestamp := fmt.Sprintf("%d", start.Unix())
 		endTimestamp := fmt.Sprintf("%d", end.Unix())
@@ -105,10 +110,16 @@ var searchCmd = &cobra.Command{
 	},
 }
 
+
 func init() {
+	currentTime := time.Now()
+	defaultStart := currentTime.Add(-24 * time.Hour).Format("2006-01-02 15:04:05")
+	defaultEnd := currentTime.Format("2006-01-02 15:04:05")
+
 	searchCmd.Flags().StringVar(&searchField, "field", "", "Field to search (serialNumber, deviceName, birdName)")
 	searchCmd.Flags().StringVar(&searchTerm, "value", "", "Value to search for")
-	searchCmd.Flags().IntVar(&searchHours, "hours", 24, "Number of hours to search back for events")
+	searchCmd.Flags().StringVar(&searchStartTime, "startTime", defaultStart, "Start time (format: 2006-01-02 15:04:05)")
+	searchCmd.Flags().StringVar(&searchEndTime, "endTime", defaultEnd, "End time (format: 2006-01-02 15:04:05)")
 	searchCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
 
 	// Mark the field flag as required
