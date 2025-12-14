@@ -160,7 +160,7 @@ func fetchEvents(token string, request Request) ([]Event, error) {
 		return nil, fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", "https://api-us.vicohome.io/library/newselectlibrary", bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest("POST", GetBaseURL()+"/library/newselectlibrary", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
+	"os"
 	"github.com/dydx/vico-cli/pkg/auth"
 	"github.com/spf13/cobra"
 )
@@ -91,7 +91,12 @@ var listCmd = &cobra.Command{
 func init() {
 	listCmd.Flags().StringVar(&outputFormat, "format", "table", "Output format (table or json)")
 }
-
+func GetCountry() string {
+if v := os.Getenv("VICOHOME_COUNTRY"); v != "" {
+return v
+}
+return "US"
+}
 // listDevices fetches all devices associated with the user's account from the Vicohome API.
 // It takes an authentication token and returns a slice of Device objects and any error encountered.
 // This function handles the API request, response parsing, and error handling including
@@ -99,7 +104,7 @@ func init() {
 func listDevices(token string) ([]Device, error) {
 	req := DeviceListRequest{
 		Language:  "en",
-		CountryNo: "US",
+		CountryNo: GetCountry(),
 	}
 
 	reqBody, err := json.Marshal(req)
@@ -107,7 +112,7 @@ func listDevices(token string) ([]Device, error) {
 		return nil, fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	httpReq, err := http.NewRequest("POST", "https://api-us.vicohome.io/device/listuserdevices", bytes.NewBuffer(reqBody))
+	httpReq, err := http.NewRequest("POST", GetBaseURL()+"/device/listuserdevices", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}

@@ -99,6 +99,12 @@ func Authenticate() (string, error) {
 
 	return token, nil
 }
+func GetBaseURL() string {
+if v := os.Getenv("VICOHOME_BASE_URL"); v != "" {
+return v
+}
+return "https://api-us.vicohome.io"
+}
 
 // authenticateDirectly performs authentication to the Vicohome API without using the token cache.
 // It retrieves credentials from environment variables (VICOHOME_EMAIL and VICOHOME_PASSWORD),
@@ -128,7 +134,7 @@ func authenticateDirectly() (string, error) {
 		return "", fmt.Errorf("error marshaling login request: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", "https://api-us.vicohome.io/account/login", bytes.NewBuffer(reqBody))
+	req, err := http.NewRequest("POST", GetBaseURL()+"/account/login", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return "", fmt.Errorf("error creating request: %w", err)
 	}

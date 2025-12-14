@@ -90,7 +90,7 @@ func getDevice(token string, serialNumber string) (Device, error) {
 		return Device{}, fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	httpReq, err := http.NewRequest("POST", "https://api-us.vicohome.io/device/selectsingledevice", bytes.NewBuffer(reqBody))
+	httpReq, err := http.NewRequest("POST", GetBaseURL()+"/device/selectsingledevice", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return Device{}, fmt.Errorf("error creating request: %w", err)
 	}

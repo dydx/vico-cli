@@ -91,7 +91,7 @@ func getEvent(token string, traceID string) (Event, error) {
 		return Event{}, fmt.Errorf("error marshaling request: %w", err)
 	}
 
-	httpReq, err := http.NewRequest("POST", "https://api-us.vicohome.io/library/newselectsinglelibrary", bytes.NewBuffer(reqBody))
+	httpReq, err := http.NewRequest("POST", GetBaseURL()+"/library/newselectsinglelibrary", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return Event{}, fmt.Errorf("error creating request: %w", err)
 	}

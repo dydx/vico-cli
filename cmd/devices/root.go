@@ -6,6 +6,7 @@ package devices
 
 import (
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var devicesCmd = &cobra.Command{
@@ -18,6 +19,12 @@ func init() {
 	// Add subcommands
 	devicesCmd.AddCommand(listCmd)
 	devicesCmd.AddCommand(getCmd)
+}
+func GetBaseURL() string {
+if v := os.Getenv("VICOHOME_BASE_URL"); v != "" {
+return v
+}
+return "https://api-us.vicohome.io"
 }
 
 // GetDevicesCmd returns the devices command that provides access to device-related subcommands.
