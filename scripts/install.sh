@@ -101,8 +101,8 @@ fi
 if [ -x "$INSTALL_DIR/$REPO_NAME" ] || [ "$OS" = "windows" ]; then
   echo -e "${GREEN}Successfully installed vico-cli CLI to ${INSTALL_DIR}/${REPO_NAME}${NC}"
   echo -e "\nTo use the CLI, you need to set up your credentials:"
-  echo -e "${YELLOW}export vico-cli_EMAIL=\"your.email@example.com\"${NC}"
-  echo -e "${YELLOW}export vico-cli_PASSWORD=\"your-password\"${NC}"
+  echo -e "${YELLOW}export VICOHOME_EMAIL=\"your.email@example.com\"${NC}"
+  echo -e "${YELLOW}export VICOHOME_PASSWORD=\"your-password\"${NC}"
   echo -e "\nYou can now run: ${GREEN}${REPO_NAME} devices list${NC}"
 else
   echo -e "${RED}Installation failed. Please try again or install manually.${NC}"
